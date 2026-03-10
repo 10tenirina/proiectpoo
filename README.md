@@ -1,4 +1,5 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+# Voi primi notă pentru că nu am pus titlu și descriere
+# Rule of Thirds Analyzer
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
