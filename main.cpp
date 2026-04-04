@@ -20,8 +20,8 @@ public:
     double getY() const { return y; }
 
     double distantaFata(const Punct& alt) const {
-        double dx = x - alt.x;
-        double dy = y - alt.y;
+        const double dx = x - alt.x;
+        const double dy = y - alt.y;
         return std::sqrt(dx * dx + dy * dy);
     }
 
@@ -31,6 +31,11 @@ public:
 
     bool operator!=(const Punct& alt) const {
         return !(*this == alt);
+    }
+
+    friend std::istream& operator>>(std::istream& is, Punct& p) {
+        is >> p.x >> p.y;
+        return is;
     }
 
     // friend: acces direct la private, no getteri hah
@@ -53,6 +58,10 @@ class SubiectVizual {
     double inaltime;
     int importanta;         // 1 - 10
 
+    // aria bounding box-ului - folosita in seSuprapuneCu
+    // pentru a ignora subiectele cu dimensiuni zero
+    double arie() const { return latime * inaltime; }
+
 public:
     SubiectVizual() : denumire{"necunoscut"}, coltStangaSus{}, latime{0.0}, inaltime{0.0}, importanta{1} {
         std::cout << "Constr implicit SubiectVizual\n";
@@ -71,7 +80,7 @@ public:
         std::cout << "Constr de initializare SubiectVizual: " << denumire << "\n";
     }
 
-    //rule of thirds
+    //rule of three
 
     SubiectVizual(const SubiectVizual& other)
         : denumire{other.denumire},
@@ -112,13 +121,13 @@ public:
     // (power points = cele 4 intersectii ale liniilor care sunt la o treime
     //   (W/3, H/3), (2W/3, H/3), (W/3, 2H/3), (2W/3, 2H/3)
     double distantaFataDePowerPoint(double latimeCadru, double inaltimeCadru) const {
-        Punct centru = getCentru();
+        const Punct centru = getCentru();
         double distMin = -1.0;
         const double fractii[2] = {1.0 / 3.0, 2.0 / 3.0};
         for(double fx : fractii) {
             for(double fy : fractii) {
-                Punct pp{fx * latimeCadru, fy * inaltimeCadru};
-                double d = centru.distantaFata(pp);
+                const Punct pp{fx * latimeCadru, fy * inaltimeCadru};
+                const double d = centru.distantaFata(pp);
                 if(distMin < 0.0 || d < distMin)
                     distMin = d;
             }
@@ -130,9 +139,9 @@ public:
     // de treime (orizontala sau verticala)
     bool esteAliniat(double latimeCadru, double inaltimeCadru,
                      double toleranta = 0.05) const {
-        Punct centru = getCentru();
-        double rx = centru.getX() / latimeCadru;
-        double ry = centru.getY() / inaltimeCadru;
+        const Punct centru = getCentru();
+        const double rx = centru.getX() / latimeCadru;
+        const double ry = centru.getY() / inaltimeCadru;
         const double linii[2] = {1.0 / 3.0, 2.0 / 3.0};
         for(double l : linii) {
             if(std::abs(rx - l) <= toleranta) return true;
@@ -142,11 +151,15 @@ public:
     }
 
     // verifica daca acest subiect se suprapune spatial cu altul
+    // subiectele cu arie zero sunt ignorate
     bool seSuprapuneCu(const SubiectVizual& alt) const {
-        bool separatX = (coltStangaSus.getX() + latime       <= alt.coltStangaSus.getX())
-                     || (alt.coltStangaSus.getX() + alt.latime  <= coltStangaSus.getX());
-        bool separatY = (coltStangaSus.getY() + inaltime      <= alt.coltStangaSus.getY())
-                     || (alt.coltStangaSus.getY() + alt.inaltime <= coltStangaSus.getY());
+        if(arie() == 0.0 || alt.arie() == 0.0) return false;
+        const bool separatX =
+            (coltStangaSus.getX() + latime      <= alt.coltStangaSus.getX())
+         || (alt.coltStangaSus.getX() + alt.latime <= coltStangaSus.getX());
+        const bool separatY =
+            (coltStangaSus.getY() + inaltime       <= alt.coltStangaSus.getY())
+         || (alt.coltStangaSus.getY() + alt.inaltime <= coltStangaSus.getY());
         return !separatX && !separatY;
     }
 
@@ -162,26 +175,39 @@ public:
         return !(*this == alt);
     }
 
+    // format: denumire x y latime inaltime importanta
+    friend std::istream& operator>>(std::istream& is, SubiectVizual& sv) {
+        double x = 0.0;
+        double y = 0.0;
+        is >> sv.denumire >> x >> y >> sv.latime >> sv.inaltime >> sv.importanta;
+        sv.coltStangaSus = Punct{x, y};
+        return is;
+    }
+
     // friend: acces direct la private, exact ca in README
+    // compunere de apeluri: apeleaza Punct::operator<<
     friend std::ostream& operator<<(std::ostream& os, const SubiectVizual& sv) {
         os << sv.denumire
-           << " | colt: " << sv.coltStangaSus
+           << " | colt: " << sv.coltStangaSus   // -> Punct::operator<<
            << " | " << sv.latime << "x" << sv.inaltime
            << " | importanta: " << sv.importanta << "/10";
         return os;
     }
 };
 
-///////////////////////////////////////////////////////////////
 // Cadru - shot-ul / scena filmului.
-// Contine mai multe SubiecteVizuale si dimensiunile cadrului.
-// Un Cadru "are" SubiecteVizuale => compunere cu vector.
-///////////////////////////////////////////////////////////////
+// contine mai multe SubiecteVizuale si dimensiunile cadrului
+// un Cadru "are" SubiecteVizuale => compunere cu vector
 class Cadru {
     std::string titlu;
     double latime;
     double inaltime;
     std::vector<SubiectVizual> subiecte;   // compunere
+
+    // diagonala cadrului - folosita pentru normalizarea scorului
+    double diagonala() const {
+        return std::sqrt(latime * latime + inaltime * inaltime);
+    }
 
 public:
     Cadru() : titlu{"cadru necunoscut"}, latime{1920.0}, inaltime{1080.0} {
@@ -197,32 +223,30 @@ public:
         subiecte.push_back(subiect);
     }
 
-    // getter strict necesar: folosit in main
     const std::string& getTitlu() const { return titlu; }
 
-    // calculeaza un scor de compozitie 0-100 bazat pe proximitatea fata de power points urile grilei rule of thirds.
-    // scorul ponderat cu cat de important e fiecare subiect
+    // scor compozitie 0-100, ponderat cu importanta fiecarui subiect
+    // foloseste diagonala() pentru normalizare
     double calculeazaScorCompozitie() const {
         if(subiecte.empty()) return 0.0;
 
-        double diagonala    = std::sqrt(latime * latime + inaltime * inaltime);
         double scorTotal    = 0.0;
         double ponderaTotal = 0.0;
 
         for(const auto& sv : subiecte) {
-            double dist         = sv.distantaFataDePowerPoint(latime, inaltime);
-            double distRelativa = dist / diagonala;
-            double scorSubiect  = std::max(0.0, 100.0 - distRelativa * 100.0);
-            double pondere      = static_cast<double>(sv.getImportanta());
+            const double dist         = sv.distantaFataDePowerPoint(latime, inaltime);
+            const double distRelativa = dist / diagonala();
+            const double scorSubiect  = std::max(0.0, 100.0 - distRelativa * 100.0);
+            const double pondere      = static_cast<double>(sv.getImportanta());
             scorTotal    += scorSubiect * pondere;
             ponderaTotal += pondere;
         }
         return scorTotal / ponderaTotal;
     }
 
-    // Interpreteaza textual scorul de compozitie
+    // interpreteaza textual scorul de compozitie
     std::string interpreteazaScor() const {
-        double scor = calculeazaScorCompozitie();
+        const double scor = calculeazaScorCompozitie();
         if(scor >= 80.0) return "Compozitie excelenta - rule of thirds respectata";
         if(scor >= 55.0) return "Compozitie buna - elemente aproape de liniile de treimi";
         if(scor >= 30.0) return "Compozitie medie - elemente partial aliniate";
@@ -247,31 +271,110 @@ public:
         return *cel_mai_important;
     }
 
+    // format: titlu latime inaltime n, apoi n subiecte
+    friend std::istream& operator>>(std::istream& is, Cadru& c) {
+        int n = 0;
+        is >> c.titlu >> c.latime >> c.inaltime >> n;
+        c.subiecte.clear();
+        for(int i = 0; i < n; ++i) {
+            SubiectVizual sv{};
+            is >> sv;
+            c.subiecte.push_back(sv);
+        }
+        return is;
+    }
+
     // friend: acces direct la private
+    // compunere de apeluri: apeleaza SubiectVizual::operator<<
     friend std::ostream& operator<<(std::ostream& os, const Cadru& c) {
         os << "=== Cadru: \"" << c.titlu << "\" ("
            << c.latime << "x" << c.inaltime << "px) ===\n";
         os << "Subiecte vizuale (" << c.subiecte.size() << "):\n";
         for(const auto& sv : c.subiecte)
-            os << "  [" << sv << "]\n";
+            os << "  [" << sv << "]\n";   // -> SubiectVizual::operator<<
         return os;
     }
 };
 
-// regizorul compara doua variante de cadru pentru aceeasi scena si alege varianta aia cu scor mai bun
+// Scena - o secventa de cadre pentru aceeasi scena dintr-un film.
+// Regizorul adauga variante de cadru si alege cea mai buna compozitie.
+// Scena "are" mai multe Cadre => compunere
+class Scena {
+    std::string titlu;
+    std::vector<Cadru> cadre;   // compunere
+
+public:
+    Scena() : titlu{"scena necunoscuta"} {
+        std::cout << "Constr implicit Scena\n";
+    }
+
+    explicit Scena(const std::string& titlu_) : titlu{titlu_} {
+        std::cout << "Constr de initializare Scena: " << titlu << "\n";
+    }
+
+    void adaugaCadru(const Cadru& cadru) {
+        cadre.push_back(cadru);
+    }
+
+    const std::string& getTitlu() const { return titlu; }
+
+    // returneaza cadrul cu cel mai bun scor de compozitie
+    const Cadru& cadruRecomandat() const {
+        const Cadru* cel_mai_bun = &cadre[0];
+        for(const auto& c : cadre)
+            if(c.calculeazaScorCompozitie() > cel_mai_bun->calculeazaScorCompozitie())
+                cel_mai_bun = &c;
+        return *cel_mai_bun;
+    }
+
+    // scorul mediu al tuturor cadrelor din scena
+    double scorMediu() const {
+        if(cadre.empty()) return 0.0;
+        double total = 0.0;
+        for(const auto& c : cadre)
+            total += c.calculeazaScorCompozitie();
+        return total / static_cast<double>(cadre.size());
+    }
+
+    // raport complet: fiecare cadru cu scorul sau + recomandarea finala
+    void afiseazaRaport() const {
+        std::cout << "~~~ Raport scena: \"" << titlu << "\" ~~~\n";
+        for(const auto& c : cadre) {
+            std::cout << "  \"" << c.getTitlu() << "\""
+                      << " | scor: " << c.calculeazaScorCompozitie() << "/100"
+                      << " | " << c.interpreteazaScor() << "\n";
+        }
+        std::cout << "  Scor mediu: " << scorMediu() << "/100\n";
+        std::cout << "  Cadru recomandat: \""
+                  << cadruRecomandat().getTitlu() << "\"\n\n";
+    }
+
+    // compunere de apeluri: apeleaza Cadru::operator<<
+    // care apeleaza SubiectVizual::operator<< care apeleaza Punct::operator<<
+    friend std::ostream& operator<<(std::ostream& os, const Scena& s) {
+        os << "~~~ Scena: \"" << s.titlu << "\" ("
+           << s.cadre.size() << " cadre) ~~~\n";
+        for(const auto& c : s.cadre)
+            os << c;   // -> Cadru::operator<<
+        return os;
+    }
+};
+
+// regizorul compara variante de cadru pentru aceeasi scena si alege varianta cu scor mai bun
 int main() {
     std::cout << "======= Rule of Thirds Analyzer =======\n";
     std::cout << "Scenariu: regizorul compara doua variante de cadru pentru a alege compozitia mai buna.\n\n";
 
     // constructorii impliciti si functiile publice care nu prea apar in scenariu
-
     std::cout << "--- Constructori impliciti si functii de baza ---\n";
     Punct originea{};
     SubiectVizual svGol{};
     Cadru cadrGol{};
+    Scena scenaGoala{};
     std::cout << "Punct implicit: " << originea << "\n";
     std::cout << "SubiectVizual implicit: " << svGol << "\n";
     std::cout << "Cadru implicit - titlu: " << cadrGol.getTitlu() << "\n";
+    std::cout << "Scena implicita - titlu: " << scenaGoala.getTitlu() << "\n";
 
     // Punct::distantaFata apelata explicit
     Punct pp1{640.0, 360.0};
@@ -284,6 +387,16 @@ int main() {
     // power points:    (640,360), (1280,360), (640,720), (1280,720)
     const double W = 1920.0;
     const double H = 1080.0;
+
+    // citire cadru de la tastatura (sau redirectionat din tastatura.txt)
+    std::cout << "--- Cadru citit de la tastatura ---\n";
+    std::cout << "(format: titlu latime inaltime n_subiecte\n";
+    std::cout << "         apoi: denumire x y latime inaltime importanta)\n";
+    Cadru cadrCitit{};
+    std::cin >> cadrCitit;
+    std::cout << cadrCitit;
+    std::cout << "Scor: " << cadrCitit.calculeazaScorCompozitie() << "/100"
+              << " | " << cadrCitit.interpreteazaScor() << "\n\n";
 
     //A: compozitie buna - placement pe power points
     std::cout << "--- Varianta A: compozitie intentionata ---\n";
@@ -323,7 +436,7 @@ int main() {
     variantaA.adaugaSubiect(secundarA);
 
     std::cout << variantaA;
-    double scorA = variantaA.calculeazaScorCompozitie();
+    const double scorA = variantaA.calculeazaScorCompozitie();
     std::cout << "Scor: " << scorA << "/100 | " << variantaA.interpreteazaScor() << "\n";
     std::cout << "Suprapuneri in cadru: " << (variantaA.areSuprapuneri() ? "Da" : "Nu") << "\n";
     std::cout << "Protagonist: " << variantaA.protagonistul() << "\n\n";
@@ -365,20 +478,21 @@ int main() {
     variantaB.adaugaSubiect(secundarB);
 
     std::cout << variantaB;
-    double scorB = variantaB.calculeazaScorCompozitie();
+    const double scorB = variantaB.calculeazaScorCompozitie();
     std::cout << "Scor: " << scorB << "/100 | " << variantaB.interpreteazaScor() << "\n";
     std::cout << "Suprapuneri in cadru: " << (variantaB.areSuprapuneri() ? "Da" : "Nu") << "\n";
     std::cout << "Protagonist: " << variantaB.protagonistul() << "\n\n";
 
-    // cum decide regizorul
-    std::cout << "--- Decizia regizorului ---\n";
-    std::cout << variantaA.getTitlu() << ": " << scorA << "/100\n";
-    std::cout << variantaB.getTitlu() << ": " << scorB << "/100\n";
-    if(scorA >= scorB)
-        std::cout << "Regizorul alege: " << variantaA.getTitlu() << "\n\n";
-    else
-        std::cout << "Regizorul alege: " << variantaB.getTitlu() << "\n\n";
+    // scena care contine toate cadrele - regizorul vede imaginea de ansamblu
+    Scena scena{"The Godfather - scena finala"};
+    scena.adaugaCadru(variantaA);
+    scena.adaugaCadru(variantaB);
+    scena.adaugaCadru(cadrCitit);
 
+    std::cout << scena;          // Scena -> Cadru -> SubiectVizual -> Punct
+    scena.afiseazaRaport();
+
+    // test regula celor trei
     std::cout << "--- Test regula celor trei ---\n";
     SubiectVizual sv1{"Original", Punct{100.0, 200.0}, 150.0, 100.0, 8};
     SubiectVizual sv2{sv1};
