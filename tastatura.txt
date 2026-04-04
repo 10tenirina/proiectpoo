@@ -1,2 +1,3 @@
-5
-11 22 33 44 55
+Cadru_testat 1920 1080 2
+Michael_Corleone 570 280 140 220 9
+Pistolul 1250 690 60 40 8
