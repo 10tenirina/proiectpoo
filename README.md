@@ -1,4 +1,28 @@
 # Rule of Thirds Analyzer
+ 
+Proiect realizat în cadrul cursului de **Programare Orientată pe Obiecte** (Facultatea de Matematică și Informatică, UniBuc).
+ 
+## Descriere
+ 
+**Rule of thirds** este una dintre cele mai folosite tehnici de compoziție în cinematografie și fotografie. Ideea e simplă: împarți cadrul în 9 părți egale cu două linii orizontale și două verticale, și plasezi elementele importante ale scenei pe aceste linii sau la intersecțiile lor — numite **power points**. Rezultatul e o imagine mai dinamică și mai naturală decât dacă ai centra subiectul.
+ 
+Acest program analizează cadre cinematografice și evaluează cât de bine respectă elementele din scenă regula treimilor. Fiecare element focal (actor, obiect important) este reprezentat printr-un bounding box, iar programul calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element.
+ 
+## Clase
+ 
+- **`Punct`** — coordonate 2D (x, y) în cadrul filmului
+- **`SubiectVizual`** — element focal dintr-o scenă: actor, obiect important etc., definit printr-un bounding box și un nivel de importanță (1–10)
+- **`Cadru`** — un shot cinematografic; conține mai multe subiecte vizuale și calculează scorul de compoziție al întregului cadru
+- **`Scena`** — o secvență de cadre pentru aceeași scenă; permite compararea variantelor și alegerea celei mai bune compoziții
+ 
+## Funcționalități
+ 
+- calcularea scorului de compoziție (0–100) pentru un cadru, ponderat cu importanța fiecărui subiect
+- verificarea alinierii subiectelor pe liniile de treime
+- detectarea suprapunerilor între subiecte
+- identificarea protagonistului (subiectul cu importanța cea mai mare)
+- compararea mai multor variante de cadru și recomandarea celei mai bune
+- citirea cadrelor de la tastatură sau din fișier
 
 ## Voi primi notă pentru că am pus titlu și descriere
 
