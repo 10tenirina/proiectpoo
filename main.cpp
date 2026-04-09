@@ -33,11 +33,6 @@ public:
         return !(*this == alt);
     }
 
-    friend std::istream& operator>>(std::istream& is, Punct& p) {
-        is >> p.x >> p.y;
-        return is;
-    }
-
     // friend: acces direct la private, no getteri hah
     friend std::ostream& operator<<(std::ostream& os, const Punct& p) {
         os << "(" << p.x << ", " << p.y << ")";
@@ -296,8 +291,8 @@ public:
     }
 };
 
-// Scena - o secventa de cadre pentru aceeasi scena dintr-un film.
-// Regizorul adauga variante de cadru si alege cea mai buna compozitie.
+// Scena - o secventa de cadre pentru aceeasi scena dintr-un film
+// Regizorul adauga variante de cadru si alege cea mai buna compozitie
 // Scena "are" mai multe Cadre => compunere
 class Scena {
     std::string titlu;
@@ -491,6 +486,9 @@ int main() {
 
     std::cout << scena;          // Scena -> Cadru -> SubiectVizual -> Punct
     scena.afiseazaRaport();
+
+    std::cout << "Scor mediu scena: " << scena.scorMediu() << "/100\n";
+    std::cout << "Cadru recomandat: " << scena.cadruRecomandat().getTitlu() << "\n";
 
     // test regula celor trei
     std::cout << "--- Test regula celor trei ---\n";
