@@ -1,3 +1,11 @@
-Cadru_testat 1920 1080 2
-Michael_Corleone 570 280 140 220 9
-Pistolul 1250 690 60 40 8
+The_Godfather_scena_finala 2
+
+Cadru_A_compozitie_buna 1920 1080 3
+Michael_Corleone 570 280 140 220 Actor 9 dreapta
+Pistolul 1250 690 60 40 Recuzita 8 static
+Usa_din_spate 200 100 300 500 Decor 6 arhitectural
+
+Cadru_B_compozitie_slaba 1920 1080 3
+Michael_Corleone 890 430 140 220 Actor 9 stanga
+Pistolul 1010 610 60 40 Recuzita 8 static
+Usa_din_spate 800 400 300 500 Decor 6 arhitectural
