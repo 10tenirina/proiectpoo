@@ -12,11 +12,13 @@
 
 class ExceptieRuleOfThirds : public std::exception {
     std::string mesaj;
-public:
-    explicit ExceptieRuleOfThirds(const std::string& mesaj_)
-        : mesaj{mesaj_} {}
 
-    const char* what() const noexcept override {
+public:
+    explicit ExceptieRuleOfThirds(const std::string &mesaj_)
+        : mesaj{mesaj_} {
+    }
+
+    const char *what() const noexcept override {
         return mesaj.c_str();
     }
 };
@@ -25,8 +27,9 @@ public:
 // Un cadru cu dimensiuni invalide nu poate calcula power points.
 class ExceptieCadruInvalid : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieCadruInvalid(const std::string& detaliu)
-        : ExceptieRuleOfThirds{"Cadru invalid: " + detaliu} {}
+    explicit ExceptieCadruInvalid(const std::string &detaliu)
+        : ExceptieRuleOfThirds{"Cadru invalid: " + detaliu} {
+    }
 };
 
 // Aruncat in constructorul SubiectVizual cand:
@@ -34,8 +37,9 @@ public:
 //   - latime sau inaltime sunt negative
 class ExceptieSubiectInvalid : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieSubiectInvalid(const std::string& detaliu)
-        : ExceptieRuleOfThirds{"Subiect invalid: " + detaliu} {}
+    explicit ExceptieSubiectInvalid(const std::string &detaliu)
+        : ExceptieRuleOfThirds{"Subiect invalid: " + detaliu} {
+    }
 };
 
 // Aruncat cand se cere o operatie pe un cadru sau scena fara subiecte:
@@ -43,6 +47,7 @@ public:
 //   - cadruRecomandat() pe scena goala
 class ExceptieScenaGoala : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieScenaGoala(const std::string& detaliu)
-        : ExceptieRuleOfThirds{"Operatie imposibila: " + detaliu} {}
+    explicit ExceptieScenaGoala(const std::string &detaliu)
+        : ExceptieRuleOfThirds{"Operatie imposibila: " + detaliu} {
+    }
 };

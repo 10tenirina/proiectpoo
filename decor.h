@@ -8,19 +8,21 @@
 // daca bounding box-ul sau taie o linie de treime, ghideaza privirea
 // spre subiectul principal => bonus la scor.
 class Decor : public SubiectVizual {
-    std::string tipDecor;   // "arhitectural" | "mobilier" | "vegetal" | etc.
+    std::string tipDecor; // "arhitectural" | "mobilier" | "vegetal" | etc.
 
-    void afiseazaDetalii(std::ostream& os) const override;
+    void afiseazaDetalii(std::ostream &os) const override;
 
 public:
-    explicit Decor(const std::string& denumire_,
-                   const Punct& colt_,
+    explicit Decor(const std::string &denumire_,
+                   const Punct &colt_,
                    double latime_,
                    double inaltime_,
                    int importanta_,
-                   const std::string& tipDecor_);
+                   const std::string &tipDecor_);
 
-    std::unique_ptr<SubiectVizual> clone()                              const override;
-    double                         contributieCompozitionala(double W, double H) const override;
-    std::string                    sfatCompozitional()                  const override;
+    std::unique_ptr<SubiectVizual> clone() const override;
+
+    double contributieCompozitionala(double W, double H) const override;
+
+    std::string sfatCompozitional() const override;
 };

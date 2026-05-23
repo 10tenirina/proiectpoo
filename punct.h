@@ -8,16 +8,21 @@
 class Punct {
     double x;
     double y;
+
 public:
     Punct();
+
     explicit Punct(double x_, double y_);
 
     double getX() const;
+
     double getY() const;
-    double distantaFata(const Punct& alt) const;
 
-    bool operator==(const Punct& alt) const;
-    bool operator!=(const Punct& alt) const;
+    double distantaFata(const Punct &alt) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Punct& p);
+    bool operator==(const Punct &alt) const;
+
+    bool operator!=(const Punct &alt) const;
+
+    friend std::ostream &operator<<(std::ostream &os, const Punct &p);
 };

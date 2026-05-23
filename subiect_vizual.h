@@ -16,24 +16,25 @@
 //   fara ca operatorul sa fie virtual.
 class SubiectVizual {
     std::string denumire;
-    Punct       coltStangaSus;
-    double      latime;
-    double      inaltime;
-    int         importanta;   // [1, 10]
+    Punct coltStangaSus;
+    double latime;
+    double inaltime;
+    int importanta; // [1, 10]
 
     // contor static: cate subiecte au fost create in total
     static int numarSubiecteCreate;
 
     double arie() const;
+
     static void valideaza(double latime_, double inaltime_, int importanta_);
 
     // NVI: privata, pura, implementata de fiecare derivata
-    virtual void afiseazaDetalii(std::ostream& os) const = 0;
+    virtual void afiseazaDetalii(std::ostream &os) const = 0;
 
 protected:
     // accesibil doar din derivate
-    explicit SubiectVizual(const std::string& denumire_,
-                           const Punct& colt_,
+    explicit SubiectVizual(const std::string &denumire_,
+                           const Punct &colt_,
                            double latime_,
                            double inaltime_,
                            int importanta_);
@@ -60,17 +61,21 @@ public:
     virtual std::string sfatCompozitional() const = 0;
 
     // metode comune (non-virtuale) - logica geometrica aceeasi pentru toti
-    const std::string& getDenumire()   const;
-    int                getImportanta() const;
-    Punct              getCentru()     const;
+    const std::string &getDenumire() const;
+
+    int getImportanta() const;
+
+    Punct getCentru() const;
 
     double distantaFataDePowerPoint(double W, double H) const;
-    bool   esteAliniat(double W, double H, double toleranta = 0.05) const;
-    bool   seSuprapuneCu(const SubiectVizual& alt) const;
+
+    bool esteAliniat(double W, double H, double toleranta = 0.05) const;
+
+    bool seSuprapuneCu(const SubiectVizual &alt) const;
 
     // static: numar total de subiecte create de la lansarea programului
     static int getNumarSubiecteCreate();
 
     // NVI: non-virtual, apeleaza intern afiseazaDetalii() (virtual)
-    friend std::ostream& operator<<(std::ostream& os, const SubiectVizual& sv);
+    friend std::ostream &operator<<(std::ostream &os, const SubiectVizual &sv);
 };
