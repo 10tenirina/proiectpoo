@@ -14,24 +14,26 @@
 class ExceptieRuleOfThirds : public std::exception {
     std::string mesaj;
 public:
-    explicit ExceptieRuleOfThirds(const std::string& mesaj_)
-        : mesaj{mesaj_} {}
-    const char* what() const noexcept override { return mesaj.c_str(); }
+    explicit ExceptieRuleOfThirds(const std::string &mesaj_)
+        : mesaj{mesaj_} {
+    }
+
+    const char *what() const noexcept override { return mesaj.c_str(); }
 };
 
 // Aruncat in dinFisier() - fisier inexistent sau eroare la citire.
 // Primeste separat numele fisierului si motivul pentru mesaj clar.
 class ExceptieFisierInvalid : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieFisierInvalid(const std::string& numeFisier,
-                                   const std::string& motiv)
+    explicit ExceptieFisierInvalid(const std::string &numeFisier,
+                                   const std::string &motiv)
         : ExceptieRuleOfThirds{"Fisier invalid \"" + numeFisier + "\": " + motiv} {}
 };
 
 // Aruncat in constructorul Cadru cand latime sau inaltime sunt <= 0.
 class ExceptieCadruInvalid : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieCadruInvalid(const std::string& detaliu)
+    explicit ExceptieCadruInvalid(const std::string &detaliu)
         : ExceptieRuleOfThirds{"Cadru invalid: " + detaliu} {}
 };
 
@@ -40,7 +42,7 @@ public:
 //   - latime sau inaltime sunt negative
 class ExceptieSubiectInvalid : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieSubiectInvalid(const std::string& detaliu)
+    explicit ExceptieSubiectInvalid(const std::string &detaliu)
         : ExceptieRuleOfThirds{"Subiect invalid: " + detaliu} {}
 };
 
@@ -48,6 +50,6 @@ public:
 // pe un cadru/scena fara subiecte/cadre.
 class ExceptieScenaGoala : public ExceptieRuleOfThirds {
 public:
-    explicit ExceptieScenaGoala(const std::string& detaliu)
+    explicit ExceptieScenaGoala(const std::string &detaliu)
         : ExceptieRuleOfThirds{"Operatie imposibila: " + detaliu} {}
 };
