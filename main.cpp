@@ -18,7 +18,7 @@
 //   Actor:   + directiePrivire  ("stanga" | "dreapta" | "camera")
 //   Recuzita: + mobilitate      ("static" | "dinamic")
 //   Decor:   + tipDecor         ("arhitectural" | "mobilier" | "vegetal" | ...)
-std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream& is);
+std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is);
 
 // ============================================================
 // Cadru - shot-ul cinematografic.
@@ -29,10 +29,10 @@ std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream& is);
 // => definim explicit cc si op= folosind copy-and-swap + clone().
 // ============================================================
 class Cadru {
-    std::string                              titlu;
-    double                                   latime;
-    double                                   inaltime;
-    std::vector<std::unique_ptr<SubiectVizual>> subiecte;   // pointer la baza
+    std::string titlu;
+    double latime;
+    double inaltime;
+    std::vector<std::unique_ptr<SubiectVizual> > subiecte; // pointer la baza
 
 public:
     Cadru() : titlu{"cadru necunoscut"}, latime{1920.0}, inaltime{1080.0} {}
@@ -41,7 +41,7 @@ public:
         : titlu{titlu_}, latime{latime_}, inaltime{inaltime_} {
         if(latime_ <= 0.0)
             throw ExceptieCadruInvalid("latime invalida (" + std::to_string(latime_) + ")");
-        if(inaltime_ <= 0.0)
+        if (inaltime_ <= 0.0)
             throw ExceptieCadruInvalid("inaltime invalida (" + std::to_string(inaltime_) + ")");
     }
 
@@ -61,12 +61,12 @@ public:
         swap(a.subiecte, b.subiecte);
     }
 
-    Cadru& operator=(Cadru other) {   // other e deja o copie (cc apelat)
+    Cadru &operator=(Cadru other) {   // other e deja o copie (cc apelat)
         swap(*this, other);
         return *this;
     }
 
-    ~Cadru() = default;   // unique_ptr elibereaza memoria automat
+    ~Cadru() = default; // unique_ptr elibereaza memoria automat
 
     const std::string& getTitlu() const { return titlu; }
 
@@ -116,15 +116,15 @@ public:
         auto it = std::max_element(subiecte.begin(), subiecte.end(),
             [](const auto& a, const auto& b) {
                 return a->getImportanta() < b->getImportanta();
-            });
-        return **it;   // it -> unique_ptr -> SubiectVizual&
+                                   });
+        return **it; // it -> unique_ptr -> SubiectVizual&
     }
 
     // format fisier: titlu latime inaltime n, urmat de n subiecte
-    friend std::istream& operator>>(std::istream& is, Cadru& c) {
+    friend std::istream &operator>>(std::istream& is, Cadru& c) {
         int n = 0;
         is >> c.titlu >> c.latime >> c.inaltime >> n;
-        if(c.latime <= 0.0)
+        if (c.latime <= 0.0)
             throw ExceptieCadruInvalid(
                 "latime invalida in fisier (" + std::to_string(c.latime) + ")");
         if(c.inaltime <= 0.0)
@@ -140,7 +140,7 @@ public:
     // Cadru::op<< -> SubiectVizual::op<< -> afiseazaDetalii() virtual
     friend std::ostream& operator<<(std::ostream& os, const Cadru& c) {
         os << "=== Cadru: \"" << c.titlu << "\" ("
-           << c.latime << "x" << c.inaltime << "px) ===\n";
+                << c.latime << "x" << c.inaltime << "px) ===\n";
         os << "Subiecte vizuale (" << c.subiecte.size() << "):\n";
         for(const auto& sv : c.subiecte)
             os << "  " << *sv << "\n";   // -> SubiectVizual::operator<<
@@ -160,9 +160,9 @@ public:
 
     explicit Scena(const std::string& titlu_) : titlu{titlu_} {}
 
-    const std::string& getTitlu() const { return titlu; }
+    const std::string &getTitlu() const { return titlu; }
 
-    void adaugaCadru(const Cadru& cadru) {
+    void adaugaCadru(const Cadru &cadru) {
         cadre.push_back(cadru);
     }
 
@@ -173,12 +173,12 @@ public:
         auto it = std::max_element(cadre.begin(), cadre.end(),
             [](const Cadru& a, const Cadru& b) {
                 return a.calculeazaScorCompozitie() < b.calculeazaScorCompozitie();
-            });
+                                   });
         return *it;
     }
 
     double scorMediu() const {
-        if(cadre.empty()) return 0.0;
+        if (cadre.empty()) return 0.0;
         double total = 0.0;
         for(const auto& c : cadre)
             total += c.calculeazaScorCompozitie();
@@ -199,7 +199,7 @@ public:
                   << cadruRecomandat().getTitlu() << "\"\n\n";
     }
 
-    friend std::istream& operator>>(std::istream& is, Scena& s) {
+    friend std::istream& operator>>(std::istream &is, Scena &s) {
         int n = 0;
         is >> s.titlu >> n;
         s.cadre.clear();
@@ -213,7 +213,7 @@ public:
 
     static Scena dinFisier(const std::string& numeFisier) {
         std::ifstream f(numeFisier);
-        if(!f.is_open())
+        if (!f.is_open())
             throw ExceptieFisierInvalid(numeFisier, "nu poate fi deschis");
         Scena s{};
         f >> s;
@@ -269,7 +269,7 @@ int main() {
     std::cout << "======= Rule of Thirds Analyzer =======\n\n";
 
     try {
-        Scena scena = Scena::dinFisier("scena.txt");
+        Scena scena = Scena::dinFisier("assets/scena.txt");
         std::cout << scena;
         scena.afiseazaRaport();
 
@@ -277,7 +277,7 @@ int main() {
         std::cout << "Scor mediu scena \"" << scena.getTitlu() << "\": "
                   << scena.scorMediu() << "/100\n";
         std::cout << "Cadru recomandat: \""
-                  << scena.cadruRecomandat().getTitlu() << "\"\n\n";
+                << scena.cadruRecomandat().getTitlu() << "\"\n\n";
 
         // dynamic_cast cu sens: daca protagonistul primului cadru e Actor,
         // afisam directia privirii (info disponibila doar pe Actor)
@@ -292,16 +292,15 @@ int main() {
 
         const SubiectVizual& prot = cadruTest.protagonistul();
         // downcast: verificam daca protagonistul e Actor pentru info specifice
-        const Actor* actorPtr = dynamic_cast<const Actor*>(&prot);
-        if(actorPtr != nullptr) {
+        const Actor* actorPtr = dynamic_cast<const Actor *>(&prot);
+        if (actorPtr != nullptr) {
             std::cout << "Protagonistul \"" << actorPtr->getDenumire()
                       << "\" este Actor si priveste spre: "
                       << actorPtr->getDirectiePrivire() << "\n";
         }
         std::cout << "Total subiecte create: "
                   << SubiectVizual::getNumarSubiecteCreate() << "\n\n";
-    }
-    catch(const ExceptieFisierInvalid& e) {
+    } catch (const ExceptieFisierInvalid &e) {
         std::cout << "[Eroare fisier] " << e.what() << "\n";
         return 1;
     }
@@ -329,10 +328,10 @@ int main() {
         std::make_unique<Actor>("TestActor", Punct{640.0, 360.0}, 100.0, 200.0, 7, "stanga"));
     Cadru c2{c1};          // copy constructor: cloneaza subiectele prin clone()
     std::cout << "cc: cadru copiat, scor original=" << c1.calculeazaScorCompozitie()
-              << " scor copie=" << c2.calculeazaScorCompozitie() << "\n";
+            << " scor copie=" << c2.calculeazaScorCompozitie() << "\n";
 
     Cadru c3("Cadru_alt", 1280.0, 720.0);
-    c3 = c1;               // operator= copy-and-swap
+    c3 = c1; // operator= copy-and-swap
     std::cout << "op=: dupa atribuire, scor=" << c3.calculeazaScorCompozitie() << "\n";
 
     // adaugaCadru folosita explicit: construim o scena din cadre create manual
@@ -340,7 +339,7 @@ int main() {
     scenaTest.adaugaCadru(c1);
     scenaTest.adaugaCadru(c3);
     std::cout << "Scena manuala cu " << "2 cadre"
-              << ", scor mediu: " << scenaTest.scorMediu() << "/100\n";
+            << ", scor mediu: " << scenaTest.scorMediu() << "/100\n";
 
     std::cout << "\n======= Analiza finalizata. =======\n";
     return 0;
