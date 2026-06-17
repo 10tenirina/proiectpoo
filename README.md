@@ -49,6 +49,35 @@ x, y = colțul stânga-sus al bounding box-ului (pixeli)
 latime, inaltime = dimensiunile bounding box-ului (pixeli)
 importanta = întreg în [1, 10]; ponderează subiectul în scorul cadrului
 
+## Mod interactiv
+
+Programul citește comenzi din `std::cin`. Le poți tasta direct sau le poți
+pune în `tastatura.txt` și rula cu redirectare:
+
+    ./oop < tastatura.txt
+
+Comenzi (o comandă pe linie):
+
+1 Afișează raportul scenei (scor și interpretare pe fiecare cadru,
+scor mediu, cadru recomandat).
+2 Afișează clasamentul cadrelor, ordonate descrescător după scor,
+cu tipul de compoziție al fiecăruia.
+3 i j Compară side-by-side cadrele cu indecșii i și j (scor, tip
+compoziție, echilibru vizual) și spune care e mai bine compus.
+4 i Analiză detaliată a cadrului i: scorul fiecărui subiect în
+parte plus sfatul lui de compoziție, avertismente de
+suprapunere, apoi tipul de compoziție și echilibrul vizual.
+(Spre deosebire de 3, care compară două cadre la nivel de
+ansamblu, 4 intră în profunzime într-un singur cadru.)
+5 i <subiect> Adaugă un subiect în cadrul i. <subiect> se scrie în același
+format ca în fișierele de scenă:
+denumire x y latime inaltime Tip importanta camp_specific
+ex: Reflector 640 360 80 120 SursaLumina 6 laterala
+0 Iese din modul interactiv.
+
+Indecșii cadrelor încep de la 0. Un index invalid produce un mesaj de eroare,
+nu oprește programul. La stdin gol, programul iese imediat (nu blochează).
+
 ## Voi primi notă pentru că am pus titlu și descriere
 
 ### Folosiți template-ul corespunzător grupei voastre!

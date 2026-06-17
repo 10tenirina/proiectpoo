@@ -3,6 +3,9 @@
 #include <fstream>
 #include <algorithm>
 #include <numeric>
+#include <cstddef>
+#include <utility>
+#include <vector>
 
 Scena::Scena() : titlu{"scena necunoscuta"} {
 }
@@ -47,6 +50,62 @@ void Scena::afiseazaRaport() const {
     std::cout << "  Scor mediu: " << scorMediu() << "/100\n";
     std::cout << "  Cadru recomandat: \""
             << cadruRecomandat().getTitlu() << "\"\n\n";
+}
+
+void Scena::afiseazaClasament() const {
+    if (cadre.empty())
+        throw ExceptieScenaGoala("afiseazaClasament() apelat pe scena fara cadre");
+
+    // sortam indici (nu copiem cadrele) descrescator dupa scor
+    std::vector<std::size_t> ordine(cadre.size());
+    std::iota(ordine.begin(), ordine.end(), std::size_t{0});
+    std::sort(ordine.begin(), ordine.end(),
+              [this](std::size_t a, std::size_t b) {
+                  return cadre[a].calculeazaScorCompozitie()
+                         > cadre[b].calculeazaScorCompozitie();
+              });
+
+    std::cout << "=== Clasament cadre dupa scor: \"" << titlu << "\" ===\n";
+    std::size_t loc = 1;
+    for (const std::size_t idx: ordine) {
+        std::cout << "  " << loc << ". \"" << cadre[idx].getTitlu() << "\""
+                << " | scor " << cadre[idx].calculeazaScorCompozitie() << "/100"
+                << " | " << descriereTipCompozitie(cadre[idx].tipCompozitie())
+                << "\n";
+        ++loc;
+    }
+    std::cout << "\n";
+}
+
+std::size_t Scena::numarCadre() const {
+    return cadre.size();
+}
+
+void Scena::afiseazaAnalizaCadru(std::size_t index) const {
+    if (index >= cadre.size())
+        throw ExceptieCadruInvalid(
+            "index cadru in afara intervalului (" + std::to_string(index) + ")");
+    const Cadru &c = cadre[index];
+    // drill-down: scorul fiecarui subiect + sfat + suprapuneri (ce nu arata comparatia)
+    c.raportDetaliat();
+    // sinteza la nivel de cadru
+    std::cout << "  tip compozitie: " << descriereTipCompozitie(c.tipCompozitie()) << "\n";
+    std::cout << "  echilibru vizual: " << c.analizeazaEchilibru() << "\n";
+}
+
+void Scena::comparaCadre(std::size_t i, std::size_t j) const {
+    if (i >= cadre.size() || j >= cadre.size())
+        throw ExceptieCadruInvalid(
+            "index cadru in afara intervalului (" + std::to_string(i)
+            + ", " + std::to_string(j) + ")");
+    cadre[i].comparaCu(cadre[j]);
+}
+
+void Scena::adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizual> subiect) {
+    if (index >= cadre.size())
+        throw ExceptieCadruInvalid(
+            "index cadru in afara intervalului (" + std::to_string(index) + ")");
+    cadre[index].adaugaSubiect(std::move(subiect));
 }
 
 Scena Scena::dinFisier(const std::string &numeFisier) {

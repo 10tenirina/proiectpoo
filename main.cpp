@@ -1,9 +1,75 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <cstddef>
 #include "scena.h"
 #include "actor.h"    // necesar pentru dynamic_cast la Actor
 #include "decor.h"    // necesar pentru adaugaSubiect manual
+
+namespace {
+
+void afiseazaMeniu() {
+    std::cout << "\n=== Meniu interactiv (comenzi din stdin / tastatura.txt) ===\n"
+              << "  1             - afiseaza raportul scenei\n"
+              << "  2             - afiseaza clasamentul cadrelor\n"
+              << "  3 i j         - compara cadrele i si j\n"
+              << "  4 i           - analiza detaliata a cadrului i (scor pe fiecare subiect + tip + echilibru)\n"
+              << "  5 i <subiect> - adauga un subiect in cadrul i\n"
+              << "  0             - iesire\n"
+              << "Alege optiunea: ";
+}
+
+// Bucla de meniu condusa de EOF: la stdin gol (tastatura.txt gol) iese imediat,
+// deci nu blocheaza niciodata CI-ul.
+void ruleazaMeniu(Scena &scena) {
+    afiseazaMeniu();
+    int optiune = 0;
+    while (std::cin >> optiune) {
+        if (optiune == 0) {
+            std::cout << "Iesire din modul interactiv.\n";
+            break;
+        }
+        try {
+            switch (optiune) {
+                case 1:
+                    scena.afiseazaRaport();
+                    break;
+                case 2:
+                    scena.afiseazaClasament();
+                    break;
+                case 3: {
+                    std::size_t i = 0;
+                    std::size_t j = 0;
+                    std::cin >> i >> j;
+                    scena.comparaCadre(i, j);
+                    break;
+                }
+                case 4: {
+                    std::size_t i = 0;
+                    std::cin >> i;
+                    scena.afiseazaAnalizaCadru(i);
+                    break;
+                }
+                case 5: {
+                    std::size_t i = 0;
+                    std::cin >> i;
+                    scena.adaugaSubiectLaCadru(i, creeazaSubiectDinStream(std::cin));
+                    std::cout << "Subiect adaugat in cadrul " << i << ".\n";
+                    break;
+                }
+                default:
+                    std::cout << "Optiune invalida: " << optiune << "\n";
+                    break;
+            }
+        }
+        catch (const ExceptieRuleOfThirds &e) {
+            std::cout << "[Eroare comanda] " << e.what() << "\n";
+        }
+        std::cout << "Alege optiunea: ";
+    }
+}
+
+} // namespace
 
 int main() {
     std::cout << "======= Rule of Thirds Analyzer =======\n\n";
@@ -18,6 +84,15 @@ int main() {
         // apeleaza sfatCompozitional() si contributieCompozitionala()
         // prin pointer de baza pentru fiecare subiect
         scena.cadruRecomandat().raportDetaliat();
+
+        // clasament cadre dupa scor (std::sort)
+        scena.afiseazaClasament();
+
+        // analiza de compozitie pe cadrul recomandat: tip + echilibru vizual
+        const Cadru &recomandat = scena.cadruRecomandat();
+        std::cout << "Tip compozitie cadru recomandat: "
+                  << descriereTipCompozitie(recomandat.tipCompozitie()) << "\n";
+        std::cout << "Echilibru vizual: " << recomandat.analizeazaEchilibru() << "\n\n";
 
         // apeluri directe la scorMediu si cadruRecomandat
         std::cout << "Scor mediu scena \"" << scena.getTitlu() << "\": "
@@ -90,6 +165,15 @@ int main() {
         c3 = c1;        // operator= copy-and-swap
         std::cout << "op=: scor dupa atribuire=" << c3.calculeazaScorCompozitie() << "\n";
 
+        // construim un al doilea cadru, deliberat centrat (compozitie slaba),
+        // si il comparam side-by-side cu cadrul de mai sus
+        Cadru c4{"Cadru_centrat", 1920.0, 1080.0};
+        c4.adaugaSubiect(std::make_unique<Actor>(
+            "Protagonist_centrat", Punct{890.0, 430.0}, 140.0, 220.0, 9, "camera"));
+        c4.adaugaSubiect(std::make_unique<Decor>(
+            "Perete", Punct{800.0, 400.0}, 300.0, 500.0, 5, "arhitectural"));
+        c1.comparaCu(c4);
+
         // adaugaCadru: construim o scena din cadre incarcate din fisier
         Scena scenaTest{"Scena_construita_din_fisier"};
         scenaTest.adaugaCadru(c1);
@@ -99,6 +183,15 @@ int main() {
     }
     catch(const ExceptieRuleOfThirds& e) {
         std::cout << "[Eroare test] " << e.what() << "\n";
+    }
+
+    // Mod interactiv: comenzi din stdin (redirectate din tastatura.txt in CI)
+    try {
+        Scena scenaInteractiva = Scena::dinFisier("assets/scena.txt");
+        ruleazaMeniu(scenaInteractiva);
+    }
+    catch (const ExceptieRuleOfThirds &e) {
+        std::cout << "[Eroare] " << e.what() << "\n";
     }
 
     std::cout << "\n======= Analiza finalizata. =======\n";

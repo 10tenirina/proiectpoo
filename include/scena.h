@@ -1,9 +1,12 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <memory>
+#include <cstddef>
 #include <ostream>
 #include <istream>
 #include "cadru.h"
+#include "subiect_vizual.h"
 #include "exceptii.h"
 
 // Secventa de cadre pentru aceeasi scena dintr-un film.
@@ -28,6 +31,15 @@ public:
     double scorMediu() const;
 
     void afiseazaRaport() const;
+
+    // STL: std::sort; afiseaza cadrele ordonate descrescator dupa scor
+    void afiseazaClasament() const;
+
+    // operatii indexate folosite de modul interactiv; arunca daca indexul e invalid
+    std::size_t numarCadre() const;
+    void afiseazaAnalizaCadru(std::size_t index) const;
+    void comparaCadre(std::size_t i, std::size_t j) const;
+    void adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizual> subiect);
 
     static Scena dinFisier(const std::string &numeFisier);
 

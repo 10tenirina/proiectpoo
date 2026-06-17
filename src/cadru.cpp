@@ -4,6 +4,7 @@
 #include "decor.h"
 #include "sursa_lumina.h"
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 
 // ============================================================
@@ -99,6 +100,104 @@ const SubiectVizual &Cadru::protagonistul() const {
                                    return a->getImportanta() < b->getImportanta();
                                });
     return **it;
+}
+
+// ============================================================
+// Analiza de compozitie de nivel inalt
+// ============================================================
+
+std::string descriereTipCompozitie(TipCompozitie tip) {
+    switch (tip) {
+        case TipCompozitie::Centrata:
+            return "centrata (subiect in mijloc - compozitie plata)";
+        case TipCompozitie::ReguliTreimilor:
+            return "regula treimilor (subiect pe un power point)";
+        case TipCompozitie::Simetrica:
+            return "simetrica (greutate vizuala echilibrata stanga-dreapta)";
+        case TipCompozitie::Echilibrata:
+            return "echilibrata (fara aliniere clara, dar fara dezechilibru major)";
+    }
+    return "necunoscuta";
+}
+
+bool Echilibru::esteEchilibrat(double prag) const {
+    const double totalOriz = stanga + dreapta;
+    const double totalVert = sus + jos;
+    if (totalOriz <= 0.0 || totalVert <= 0.0)
+        return false;
+    const double dezechilibruOriz = std::abs(stanga - dreapta) / totalOriz;
+    const double dezechilibruVert = std::abs(sus - jos) / totalVert;
+    return dezechilibruOriz < prag && dezechilibruVert < prag;
+}
+
+std::ostream &operator<<(std::ostream &os, const Echilibru &e) {
+    os << "stanga=" << e.stanga << " dreapta=" << e.dreapta
+            << " sus=" << e.sus << " jos=" << e.jos
+            << (e.esteEchilibrat() ? " [echilibrat]" : " [dezechilibrat]");
+    return os;
+}
+
+TipCompozitie Cadru::tipCompozitie() const {
+    const Punct centru = protagonistul().getCentru(); // arunca daca e gol
+    const double rx = centru.getX() / latime;
+    const double ry = centru.getY() / inaltime;
+
+    // aproape de centrul cadrului
+    if (std::abs(rx - 0.5) < 0.08 && std::abs(ry - 0.5) < 0.08)
+        return TipCompozitie::Centrata;
+
+    // aproape de o intersectie de treimi (power point)
+    const double linii[2] = {1.0 / 3.0, 2.0 / 3.0};
+    for (const double lx: linii)
+        for (const double ly: linii)
+            if (std::abs(rx - lx) < 0.08 && std::abs(ry - ly) < 0.08)
+                return TipCompozitie::ReguliTreimilor;
+
+    // altfel, decidem dupa echilibrul vizual orizontal
+    if (analizeazaEchilibru().esteEchilibrat())
+        return TipCompozitie::Simetrica;
+
+    return TipCompozitie::Echilibrata;
+}
+
+Echilibru Cadru::analizeazaEchilibru() const {
+    Echilibru e{0.0, 0.0, 0.0, 0.0};
+    for (const auto &sv: subiecte) {
+        const double greutate = static_cast<double>(sv->getImportanta());
+        const Punct centru = sv->getCentru();
+        if (centru.getX() < latime / 2.0)
+            e.stanga += greutate;
+        else
+            e.dreapta += greutate;
+        if (centru.getY() < inaltime / 2.0)
+            e.sus += greutate;
+        else
+            e.jos += greutate;
+    }
+    return e;
+}
+
+void Cadru::comparaCu(const Cadru &alt) const {
+    std::cout << "--- Comparatie cadre ---\n";
+    std::cout << "  A: \"" << titlu << "\" | scor "
+            << calculeazaScorCompozitie() << "/100 | "
+            << descriereTipCompozitie(tipCompozitie()) << "\n";
+    std::cout << "     echilibru: " << analizeazaEchilibru() << "\n";
+    std::cout << "  B: \"" << alt.titlu << "\" | scor "
+            << alt.calculeazaScorCompozitie() << "/100 | "
+            << descriereTipCompozitie(alt.tipCompozitie()) << "\n";
+    std::cout << "     echilibru: " << alt.analizeazaEchilibru() << "\n";
+
+    const double scorA = calculeazaScorCompozitie();
+    const double scorB = alt.calculeazaScorCompozitie();
+    if (scorA > scorB)
+        std::cout << "  => \"" << titlu << "\" e mai bine compus (cu "
+                << (scorA - scorB) << " puncte)\n";
+    else if (scorB > scorA)
+        std::cout << "  => \"" << alt.titlu << "\" e mai bine compus (cu "
+                << (scorB - scorA) << " puncte)\n";
+    else
+        std::cout << "  => cele doua cadre au compozitii echivalente\n";
 }
 
 std::istream &operator>>(std::istream &is, Cadru &c) {
