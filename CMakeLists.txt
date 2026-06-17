@@ -22,12 +22,16 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/actor.cpp
         src/recuzita.cpp
         src/decor.cpp
+        src/cadru.cpp
+        src/scena.cpp
         include/exceptii.h
         include/punct.h
         include/subiect_vizual.h
         include/actor.h
         include/recuzita.h
         include/decor.h
+        include/cadru.h
+        include/scena.h
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})
@@ -51,6 +55,4 @@ if(APPLE)
     install(FILES launcher.command DESTINATION ${DESTINATION_DIR})
 endif()
 
-# tastatura.txt - pentru std::cin (redirectat de scripturile template-ului)
-# assets/       - fisiere de date citite cu ifstream (scena.txt etc.)
 copy_files(FILES tastatura.txt DIRECTORY assets COPY_TO_DESTINATION TARGET_NAME ${MAIN_EXECUTABLE_NAME})
