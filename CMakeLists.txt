@@ -22,6 +22,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/actor.cpp
         src/recuzita.cpp
         src/decor.cpp
+        src/sursa_lumina.cpp
         src/cadru.cpp
         src/scena.cpp
         include/exceptii.h
@@ -30,6 +31,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/actor.h
         include/recuzita.h
         include/decor.h
+        include/sursa_lumina.h
         include/cadru.h
         include/scena.h
 )

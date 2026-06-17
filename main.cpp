@@ -80,7 +80,7 @@ int main() {
             std::make_unique<Decor>("Fereastra_extra", Punct{1500.0, 100.0},
                                     200.0, 400.0, 5, "arhitectural"));
         std::cout << "adaugaSubiect: scor inainte=" << scorInainte
-                  << " scor dupa adaugare manuala=" << c1.calculeazaScorCompozitie() << "\n";
+                << " scor dupa adaugare manuala=" << c1.calculeazaScorCompozitie() << "\n";
 
         Cadru c2{c1};   // copy constructor: cloneaza subiectele prin clone()
         std::cout << "cc: scor original=" << c1.calculeazaScorCompozitie()

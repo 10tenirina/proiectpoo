@@ -24,6 +24,31 @@ Acest program analizează cadre cinematografice și evaluează cât de bine resp
 - compararea mai multor variante de cadru și recomandarea celei mai bune
 - citirea cadrelor de la tastatură sau din fișier
 
+## Format fișiere de date
+
+scena.txt:
+<titlu_scena> <numar_cadre>
+apoi, pentru fiecare cadru:
+<titlu_cadru> <latime> <inaltime> <numar_subiecte>
+<numar_subiecte> linii de subiecte
+
+cadru_test.txt:
+un singur cadru (fără header de scenă), aceeași linie de subiect.
+
+Linie de subiect:
+<denumire> <x> <y> <latime> <inaltime> <Tip> <importanta> <camp_specific>
+
+Tip camp_specific
+  -----------  --------------------------------------------
+Actor directiePrivire : stanga | dreapta | camera
+Recuzita mobilitate      : static | dinamic
+Decor tipDecor        : arhitectural | mobilier | vegetal | ...
+SursaLumina directie        : laterala | frontala | contra
+
+x, y = colțul stânga-sus al bounding box-ului (pixeli)
+latime, inaltime = dimensiunile bounding box-ului (pixeli)
+importanta = întreg în [1, 10]; ponderează subiectul în scorul cadrului
+
 ## Voi primi notă pentru că am pus titlu și descriere
 
 ### Folosiți template-ul corespunzător grupei voastre!

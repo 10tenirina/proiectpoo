@@ -8,7 +8,7 @@
 #include "exceptii.h"
 
 // forward declaration - fabrica e definita in cadru.cpp dupa includerea derivatelor
-std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream& is);
+std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is);
 
 // Shot-ul cinematografic.
 // Contine subiecte vizuale prin pointer de baza (unique_ptr),
@@ -17,25 +17,27 @@ std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream& is);
 // Deoarece are vector<unique_ptr<>>, unique_ptr nu e copiabil
 // => definim explicit cc si op= folosind copy-and-swap + clone().
 class Cadru {
-    std::string                                  titlu;
-    double                                       latime;
-    double                                       inaltime;
-    std::vector<std::unique_ptr<SubiectVizual>>  subiecte;   // pointer la baza
+    std::string titlu;
+    double latime;
+    double inaltime;
+    std::vector<std::unique_ptr<SubiectVizual> > subiecte; // pointer la baza
 
 public:
     Cadru();
-    explicit Cadru(const std::string& titlu_, double latime_, double inaltime_);
+
+    explicit Cadru(const std::string &titlu_, double latime_, double inaltime_);
 
     // copy constructor: cloneaza fiecare subiect prin clone() virtual
-    Cadru(const Cadru& other);
+    Cadru(const Cadru &other);
 
     // copy-and-swap
-    friend void swap(Cadru& a, Cadru& b) noexcept;
-    Cadru& operator=(Cadru other);
+    friend void swap(Cadru &a, Cadru &b) noexcept;
+
+    Cadru &operator=(Cadru other);
 
     ~Cadru() = default;
 
-    const std::string& getTitlu() const;
+    const std::string &getTitlu() const;
 
     void adaugaSubiect(std::unique_ptr<SubiectVizual> subiect);
 
@@ -51,8 +53,9 @@ public:
     void raportDetaliat() const;
 
     // STL: std::max_element; arunca ExceptieScenaGoala daca e gol
-    const SubiectVizual& protagonistul() const;
+    const SubiectVizual &protagonistul() const;
 
-    friend std::istream& operator>>(std::istream& is, Cadru& c);
-    friend std::ostream& operator<<(std::ostream& os, const Cadru& c);
+    friend std::istream &operator>>(std::istream &is, Cadru &c);
+
+    friend std::ostream &operator<<(std::ostream &os, const Cadru &c);
 };

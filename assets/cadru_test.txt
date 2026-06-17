@@ -1,3 +1,4 @@
-Test_protagonist_actor 1920 1080 2
+Test_protagonist_actor 1920 1080 3
 Pacino 570 280 140 220 Actor 9 dreapta
 Ceasca 1280 720 40 40 Recuzita 3 static
+Veioza_laterala 640 700 60 120 SursaLumina 4 laterala
