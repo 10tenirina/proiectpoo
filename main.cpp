@@ -1,7 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include "scena.h"
 #include "actor.h"    // necesar pentru dynamic_cast la Actor
+#include "decor.h"    // necesar pentru adaugaSubiect manual
 
 int main() {
     std::cout << "======= Rule of Thirds Analyzer =======\n\n";
@@ -70,6 +72,15 @@ int main() {
             throw ExceptieFisierInvalid("assets/cadru_test.txt", "nu poate fi deschis");
         Cadru c1{};
         fCopiere >> c1;
+
+        // adaugaSubiect: API public folosit pentru a adauga programatic un subiect
+        // suplimentar in cadrul citit (simuleaza ce va face un viitor object detector)
+        const double scorInainte = c1.calculeazaScorCompozitie();
+        c1.adaugaSubiect(
+            std::make_unique<Decor>("Fereastra_extra", Punct{1500.0, 100.0},
+                                    200.0, 400.0, 5, "arhitectural"));
+        std::cout << "adaugaSubiect: scor inainte=" << scorInainte
+                  << " scor dupa adaugare manuala=" << c1.calculeazaScorCompozitie() << "\n";
 
         Cadru c2{c1};   // copy constructor: cloneaza subiectele prin clone()
         std::cout << "cc: scor original=" << c1.calculeazaScorCompozitie()
