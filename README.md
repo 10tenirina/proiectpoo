@@ -10,7 +10,7 @@ Programul analizează cadre cinematografice și evaluează cât de bine respect�
 Fiecare element focal (actor, recuzită, decor, sursă de lumină) este reprezentat printr-un bounding box, iar programul
 calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element. Mai
 mult, scorul poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson,
-documentar, cinematic neutru) — același cadru poate fi „bun pentru Hollywood” și „slab pentru Wes Anderson”.
+documentar, cinematic neutru).
 
 ## Format fișiere de date
 
