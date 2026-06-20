@@ -5,6 +5,7 @@
 #include "sursa_lumina.h"
 #include "stil_compozitional.h"
 #include "stiluri.h"
+#include "observator_cadru.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -29,6 +30,8 @@ Cadru::Cadru(const Cadru &other)
     : titlu{other.titlu}, latime{other.latime}, inaltime{other.inaltime} {
     for (const auto &sv: other.subiecte)
         subiecte.push_back(sv->clone());
+    // OBSERVER: copia este un snapshot fara ascultatori. Observatorii sunt
+    // atasati la un cadru "identitate" - nu se duplica odata cu datele.
 }
 
 void swap(Cadru &a, Cadru &b) noexcept {
@@ -37,6 +40,10 @@ void swap(Cadru &a, Cadru &b) noexcept {
     swap(a.latime, b.latime);
     swap(a.inaltime, b.inaltime);
     swap(a.subiecte, b.subiecte);
+    // OBSERVER: observatorii NU se schimba prin swap. Combinat cu copy-and-swap,
+    // asta inseamna ca `c1 = c2` pastreaza ascultatorii lui c1 si primeste
+    // doar datele lui c2 - semantica intuitiva: observatorii sunt atasati
+    // la cadrul "identitate", nu fac parte din datele lui.
 }
 
 Cadru &Cadru::operator=(Cadru other) {
@@ -47,7 +54,24 @@ Cadru &Cadru::operator=(Cadru other) {
 const std::string &Cadru::getTitlu() const { return titlu; }
 
 void Cadru::adaugaSubiect(std::unique_ptr<SubiectVizual> subiect) {
+    // mentinem un pointer la subiect inainte de move pentru notificare:
+    // observatorii primesc o referinta la subiectul tocmai adaugat.
+    const SubiectVizual *ref = subiect.get();
     subiecte.push_back(std::move(subiect));
+    // OBSERVER: notificare sincrona in ordinea atasarii.
+    // raw pointers - nu owns, doar dispatch.
+    for (ObservatorCadru *obs: observatori)
+        if (obs != nullptr)
+            obs->laAdaugareSubiect(*this, *ref);
+}
+
+void Cadru::adaugaObservator(ObservatorCadru *obs) {
+    if (obs != nullptr)
+        observatori.push_back(obs);
+}
+
+void Cadru::eliminaObservatori() {
+    observatori.clear();
 }
 
 double Cadru::calculeazaScorCompozitie() const {
@@ -124,7 +148,7 @@ std::string descriereTipCompozitie(TipCompozitie tip) {
         case TipCompozitie::Centrata:
             return "centrata (subiect in mijloc - compozitie plata)";
         case TipCompozitie::ReguliTreimilor:
-            return "regula treimilor (subiect pe un power point)";
+            return "rule of thirds (subiect pe un power point)";
         case TipCompozitie::Simetrica:
             return "simetrica (greutate vizuala echilibrata stanga-dreapta)";
         case TipCompozitie::Echilibrata:

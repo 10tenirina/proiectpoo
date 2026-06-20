@@ -126,6 +126,11 @@ void Scena::evalueazaCadruCuStiluri(
     std::cout << "\n";
 }
 
+void Scena::adaugaObservatorLaToateCadrele(ObservatorCadru *obs) {
+    for (auto &c: cadre)
+        c.adaugaObservator(obs);
+}
+
 Scena Scena::dinFisier(const std::string &numeFisier) {
     std::ifstream f(numeFisier);
     if (!f.is_open())

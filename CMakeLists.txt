@@ -27,6 +27,7 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/scena.cpp
         src/stil_compozitional.cpp
         src/stiluri.cpp
+        src/observatori.cpp
         include/exceptii.h
         include/punct.h
         include/subiect_vizual.h
@@ -38,6 +39,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/scena.h
         include/stil_compozitional.h
         include/stiluri.h
+        include/observator_cadru.h
+        include/observatori.h
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})

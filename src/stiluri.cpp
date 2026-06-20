@@ -23,11 +23,11 @@ double StilCinematic::ajustarePentruTip(TipCompozitie /*tip*/, double scorAgrega
 }
 
 void StilCinematic::afiseazaDescriere(std::ostream &os) const {
-    os << "[" << numeStil() << "] stil neutru, regula treimilor clasica fara ponderi";
+    os << "[" << numeStil() << "] stil neutru, rule of thirds clasica fara ponderi";
 }
 
 // ============================================================
-// StilHollywoodClasic - regula treimilor stricta, centrarea penalizata
+// StilHollywoodClasic - rule of thirds stricta, centrarea penalizata
 // ============================================================
 
 StilHollywoodClasic::StilHollywoodClasic()
@@ -56,7 +56,7 @@ double StilHollywoodClasic::ajustarePentruTip(TipCompozitie tip, double scorAgre
 }
 
 void StilHollywoodClasic::afiseazaDescriere(std::ostream &os) const {
-    os << "[" << numeStil() << "] regula treimilor stricta; "
+    os << "[" << numeStil() << "] rule of thirds stricta; "
        << "compozitia centrata e penalizata (cinema studio-system)";
 }
 
@@ -92,7 +92,7 @@ double StilWesAnderson::ajustarePentruTip(TipCompozitie tip, double scorAgregat)
 
 void StilWesAnderson::afiseazaDescriere(std::ostream &os) const {
     os << "[" << numeStil() << "] simetrie centrala perfecta; "
-       << "regula treimilor este considerata plata";
+       << "rule of thirds este considerata plata";
 }
 
 // ============================================================

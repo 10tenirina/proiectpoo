@@ -10,6 +10,8 @@
 #include "exceptii.h"
 #include "stil_compozitional.h"
 
+class ObservatorCadru;
+
 // Secventa de cadre pentru aceeasi scena dintr-un film.
 // Permite compararea variantelor de cadru si alegerea celei mai bune compozitii.
 class Scena {
@@ -51,6 +53,11 @@ public:
     void evalueazaCadruCuStiluri(
         std::size_t index,
         const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) const;
+
+    // Observer: ataseaza acelasi observator la fiecare cadru din scena.
+    // Folosit la setup, inainte de a intra in modul interactiv, pentru ca
+    // orice modificare a unui cadru sa fie raportata in jurnal sau monitor.
+    void adaugaObservatorLaToateCadrele(ObservatorCadru *obs);
 
     static Scena dinFisier(const std::string &numeFisier);
 

@@ -12,7 +12,7 @@
 // (cu exceptia documentarului) si aplica filozofia proprie pe tipul
 // dominant de compozitie al cadrului.
 
-// Stilul implicit: regula treimilor neutra, fara ponderi sau bonusuri.
+// Stilul implicit: rule of thirds neutra, fara ponderi sau bonusuri.
 // Echivalent cu logica preexistenta a Cadrului.
 class StilCinematic : public StilCompozitional {
     void afiseazaDescriere(std::ostream &os) const override;
@@ -27,7 +27,7 @@ public:
     double ajustarePentruTip(TipCompozitie tip, double scorAgregat) const override;
 };
 
-// Hollywood "studio system": regula treimilor stricta, centrarea e penalizata
+// Hollywood "studio system": rule of thirds stricta, centrarea e penalizata
 // dur. Compozitia trebuie sa fie sigura si lizibila pentru audienta larga.
 class StilHollywoodClasic : public StilCompozitional {
     void afiseazaDescriere(std::ostream &os) const override;
@@ -42,7 +42,7 @@ public:
     double ajustarePentruTip(TipCompozitie tip, double scorAgregat) const override;
 };
 
-// Wes Anderson: simetria centrala e ideala, regula treimilor clasica e
+// Wes Anderson: simetria centrala e ideala, rule of thirds clasica e
 // considerata plata si lipsita de viziune autoriala.
 class StilWesAnderson : public StilCompozitional {
     void afiseazaDescriere(std::ostream &os) const override;

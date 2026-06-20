@@ -8,6 +8,7 @@
 #include "exceptii.h"
 
 class StilCompozitional; // forward decl pentru Strategy pattern
+class ObservatorCadru;   // forward decl pentru Observer pattern
 
 // forward declaration - fabrica e definita in cadru.cpp dupa includerea derivatelor
 std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is);
@@ -50,6 +51,9 @@ class Cadru {
     double latime;
     double inaltime;
     std::vector<std::unique_ptr<SubiectVizual> > subiecte; // pointer la baza
+    // Observer pattern: raw pointers, observatorii nu sunt detinuti de Cadru.
+    // Lifetime-ul lor e gestionat in afara (vezi observator_cadru.h).
+    std::vector<ObservatorCadru *> observatori;
 
 public:
     Cadru();
@@ -69,6 +73,12 @@ public:
     const std::string &getTitlu() const;
 
     void adaugaSubiect(std::unique_ptr<SubiectVizual> subiect);
+
+    // Observer pattern: ataseaza/detaseaza ascultatori la modificarile cadrului.
+    // Observatorii primesc notificari sincron, in ordinea atasarii.
+    void adaugaObservator(ObservatorCadru *obs);
+
+    void eliminaObservatori();
 
     // apeleaza contributieCompozitionala() virtual prin pointer de baza.
     // Foloseste stilul implicit (StilCinematic) - filozofie neutra.

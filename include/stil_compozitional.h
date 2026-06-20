@@ -16,7 +16,7 @@ enum class TipCompozitie : int;
 //   - Wes Anderson premiaza simetria centrala pe care Hollywood-ul clasic
 //     o penalizeaza ca fiind "plata";
 //   - documentarul prefera autenticitatea peste compozitia "corecta";
-//   - regula treimilor clasica e standardul "studio-system".
+//   - rule of thirds clasica e standardul "studio-system".
 //
 // Stilul opereaza la doua nivele, fara sa cunoasca structura interna a Cadrului:
 //   - ponderaSubiect()      : ajusteaza scorul individual al unui subiect;

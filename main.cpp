@@ -8,6 +8,9 @@
 #include "decor.h"    // necesar pentru adaugaSubiect manual
 #include "stil_compozitional.h"
 #include "stiluri.h"
+#include "observator_cadru.h"
+#include "observatori.h"
+#include "recuzita.h"  // pentru demo Observer
 
 namespace {
     // Strategy: instantiaza cele patru stiluri cinematografice disponibile.
@@ -216,11 +219,56 @@ int main() {
         std::cout << "[Eroare test] " << e.what() << "\n";
     }
 
+    // Observer: notificari live la modificarea cadrului.
+    // Logger-ul scrie pe stderr (separat de output principal),
+    // monitorul recalculeaza scorul si avertizeaza daca scade sub prag.
+    std::cout << "\n--- Observer: notificari live la adaugare subiect ---\n";
+    try {
+        auto stiluriDemo = creeazaStilurile();
+        LoggerCadru loggerDemo{std::cerr};
+        MonitorCompozitie monitorDemo{std::cout, *stiluriDemo[0], 50.0};
+
+        Cadru cObs{"Cadru_observat", 1920.0, 1080.0};
+        cObs.adaugaObservator(&loggerDemo);
+        cObs.adaugaObservator(&monitorDemo);
+
+        // primul subiect: scor pleaca de la 0 (cadru gol) la ceva rezonabil
+        cObs.adaugaSubiect(std::make_unique<Actor>(
+            "Heroina", Punct{600.0, 280.0}, 140.0, 220.0, 9, "dreapta"));
+        // al doilea: contribuie cu sfat compozitional bun, monitorul vede crestere
+        cObs.adaugaSubiect(std::make_unique<Decor>(
+            "Fereastra_treime", Punct{200.0, 100.0}, 300.0, 500.0, 6, "arhitectural"));
+        // al treilea: deliberat slab plasat, ca sa vedem avertismentul monitorului
+        cObs.adaugaSubiect(std::make_unique<Recuzita>(
+            "Obiect_aiurea", Punct{960.0, 540.0}, 50.0, 50.0, 2, true));
+
+        // detasam observatorii: urmatoarea adaugare nu mai produce notificari
+        cObs.eliminaObservatori();
+        std::cout << "  (observatorii detasati)\n";
+        cObs.adaugaSubiect(std::make_unique<Recuzita>(
+            "Obiect_tacut", Punct{700.0, 400.0}, 30.0, 30.0, 1, true));
+        std::cout << "  scor final dupa detasare: "
+                << cObs.calculeazaScorCompozitie() << "/100\n";
+    } catch (const ExceptieRuleOfThirds &e) {
+        std::cout << "[Eroare demo observer] " << e.what() << "\n";
+    }
+
     // Mod interactiv: comenzi din stdin (redirectate din tastatura.txt in CI)
     try {
-        Scena scenaInteractiva = Scena::dinFisier("assets/scena.txt");
-        // construim stilurile o singura data pentru toata durata meniului
+        // ordinea de declarare e importanta pentru lifetime: stilurile si
+        // observatorii TREBUIE construite inainte de scena, ca sa fie distruse
+        // dupa ea (chiar daca destructorul Scenei nu apeleaza observatorii,
+        // ordinea defensiva previne probleme la modificari viitoare).
         const auto stiluri = creeazaStilurile();
+        LoggerCadru loggerMeniu{std::cerr};
+        MonitorCompozitie monitorMeniu{std::cout, *stiluri[0], 50.0};
+
+        Scena scenaInteractiva = Scena::dinFisier("assets/scena.txt");
+        // Observer: orice optiune 5 din meniu va declansa notificari prin
+        // logger si monitor pe cadrul vizat.
+        scenaInteractiva.adaugaObservatorLaToateCadrele(&loggerMeniu);
+        scenaInteractiva.adaugaObservatorLaToateCadrele(&monitorMeniu);
+
         ruleazaMeniu(scenaInteractiva, stiluri);
     }
     catch (const ExceptieRuleOfThirds &e) {
