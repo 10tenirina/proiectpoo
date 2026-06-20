@@ -30,8 +30,7 @@ Cadru::Cadru(const Cadru &other)
     : titlu{other.titlu}, latime{other.latime}, inaltime{other.inaltime} {
     for (const auto &sv: other.subiecte)
         subiecte.push_back(sv->clone());
-    // OBSERVER: copia este un snapshot fara ascultatori. Observatorii sunt
-    // atasati la un cadru "identitate" - nu se duplica odata cu datele.
+    // observatorii sunt atasati la un cadru "identitate" - nu se duplica odata cu datele
 }
 
 void swap(Cadru &a, Cadru &b) noexcept {
@@ -40,10 +39,10 @@ void swap(Cadru &a, Cadru &b) noexcept {
     swap(a.latime, b.latime);
     swap(a.inaltime, b.inaltime);
     swap(a.subiecte, b.subiecte);
-    // OBSERVER: observatorii NU se schimba prin swap. Combinat cu copy-and-swap,
+    // observatorii NU se schimba prin swap, combinat cu copy-and-swap,
     // asta inseamna ca `c1 = c2` pastreaza ascultatorii lui c1 si primeste
     // doar datele lui c2 - semantica intuitiva: observatorii sunt atasati
-    // la cadrul "identitate", nu fac parte din datele lui.
+    // la cadrul "identitate", nu fac parte din datele lui
 }
 
 Cadru &Cadru::operator=(Cadru other) {
@@ -55,11 +54,11 @@ const std::string &Cadru::getTitlu() const { return titlu; }
 
 void Cadru::adaugaSubiect(std::unique_ptr<SubiectVizual> subiect) {
     // mentinem un pointer la subiect inainte de move pentru notificare:
-    // observatorii primesc o referinta la subiectul tocmai adaugat.
+    // observatorii primesc o referinta la subiectul tocmai adaugat
     const SubiectVizual *ref = subiect.get();
     subiecte.push_back(std::move(subiect));
-    // OBSERVER: notificare sincrona in ordinea atasarii.
-    // raw pointers - nu owns, doar dispatch.
+    // observer: notificare sincrona in ordinea atasarii
+    // raw pointers - nu owns, doar dispatch
     for (ObservatorCadru *obs: observatori)
         if (obs != nullptr)
             obs->laAdaugareSubiect(*this, *ref);
@@ -75,8 +74,8 @@ void Cadru::eliminaObservatori() {
 }
 
 double Cadru::calculeazaScorCompozitie() const {
-    // Stilul implicit: cinematic neutru (preserva comportamentul preexistent).
-    // Static const: instantiere unica, fara overhead la fiecare apel.
+    // stilul default: cinematic neutru (prezerva comportamentul preexistent)
+    // static const: instantiere unica, fara overhead la fiecare apel
     static const StilCinematic implicit;
     return calculeazaScorCompozitie(implicit);
 }
@@ -90,7 +89,7 @@ double Cadru::calculeazaScorCompozitie(const StilCompozitional &stil) const {
         const double scorBaza = sv->contributieCompozitionala(latime, inaltime);
         // stilul moduleaza scorul individual dupa filozofia proprie
         const double scorPonderat = stil.ponderaSubiect(*sv, scorBaza);
-        const double pondere = static_cast<double>(sv->getImportanta());
+        const double pondere = sv->getImportanta();
         scorTotal += scorPonderat * pondere;
         ponderaTotal += pondere;
     }
@@ -138,10 +137,6 @@ const SubiectVizual &Cadru::protagonistul() const {
                                });
     return **it;
 }
-
-// ============================================================
-// Analiza de compozitie de nivel inalt
-// ============================================================
 
 std::string descriereTipCompozitie(TipCompozitie tip) {
     switch (tip) {
@@ -215,13 +210,13 @@ Echilibru Cadru::analizeazaEchilibru() const {
 }
 
 Statistici<int> Cadru::statisticiImportanta() const {
-    // colectam importantele subiectelor in vector si construim Statistici<int>.
-    // Daca cadrul e gol, vectorul e gol -- Statistici tolereaza asta prin gol().
+    // colectam importantele subiectelor in vector si construim Statistici<int>
+    // daca cadrul e gol, vectorul e gol, statistici permite asta prin gol().
     std::vector<int> importante;
     importante.reserve(subiecte.size());
     for (const auto &sv: subiecte)
         importante.push_back(sv->getImportanta());
-    return Statistici<int>{std::move(importante)};
+    return Statistici{std::move(importante)};
 }
 
 void Cadru::comparaCu(const Cadru &alt) const {
@@ -271,15 +266,13 @@ std::ostream &operator<<(std::ostream &os, const Cadru &c) {
     return os;
 }
 
-// ============================================================
-// Fabrica de subiecte vizuale
-// Definita dupa includerea tuturor derivatelor.
+
 // Format: denumire x y latime inaltime tip importanta [camp_specific]
-//   Actor:       + directiePrivire  ("stanga" | "dreapta" | "camera")
-//   Recuzita:    + mobilitate       ("static" | "dinamic")
-//   Decor:       + tipDecor         ("arhitectural" | "mobilier" | ...)
-//   SursaLumina: + directie         ("laterala" | "frontala" | "contra")
-// ============================================================
+//   Actor + directiePrivire ("stanga" | "dreapta" | "camera")
+//   Recuzita + mobilitate ("static" | "dinamic")
+//   Decor + tipDecor ("arhitectural" | "mobilier" | ...)
+//   SursaLumina + directie ("laterala" | "frontala" | "contra")
+
 std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is) {
     std::string denumire, tip;
     double x = 0.0, y = 0.0, latime = 0.0, inaltime = 0.0;

@@ -15,21 +15,20 @@ class ObservatorCadru;   // forward decl pentru Observer pattern
 // forward declaration - fabrica e definita in cadru.cpp dupa includerea derivatelor
 std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is);
 
-// Tipul de compozitie dominant al unui cadru, dedus din pozitia
-// protagonistului si din distributia subiectelor.
-// Tipul subiacent explicit (int) permite forward-declararea enum-ului
-// in stil_compozitional.h fara dependenta ciclica.
+// tipul de compozitie dominant al unui cadru, dedus din poz protagonistului si unde s puse subiectele
+// tipul subiacent explicit (int) permite forward-declararea enum ului
+// in stil_compozitional.h fara dependenta ciclica
 enum class TipCompozitie : int {
-    Centrata, // protagonistul e in centrul cadrului (compozitie plata)
-    ReguliTreimilor, // protagonistul cade pe/langa un power point
-    Simetrica, // greutatea vizuala e echilibrata stanga-dreapta
+    Centrata, // protagonist in centrul cadrului (compozitie plata)
+    ReguliTreimilor, // protagonist cade pe/langa un power point
+    Simetrica, // greutatea vizuala e equal stanga-dreapta
     Echilibrata // niciuna dintre cele de mai sus, dar fara dezechilibru major
 };
 
 std::string descriereTipCompozitie(TipCompozitie tip);
 
-// Distributia "greutatii vizuale" (suma importantelor) pe cele patru zone
-// ale cadrului. Folosita pentru a evalua echilibrul compozitiei.
+// distributia greutatii vizuale (suma importantelor) pe cele patru zone
+// ale cadrului, folosita pentru a eval echilibrul compozitiei
 struct Echilibru {
     double stanga;
     double dreapta;
@@ -42,19 +41,18 @@ struct Echilibru {
     friend std::ostream &operator<<(std::ostream &os, const Echilibru &e);
 };
 
-// Shot-ul cinematografic.
-// Contine subiecte vizuale prin pointer de baza (unique_ptr),
-// ceea ce permite polimorfism si gestionare automata a memoriei.
+// contine subiecte vizuale prin pointer de baza (unique_ptr),
+// ceea ce permite polimorfism + gestionare automata a mem
 //
-// Deoarece are vector<unique_ptr<>>, unique_ptr nu e copiabil
+// ptc are vector<unique_ptr<>>, unique_ptr nu e copiabil
 // => definim explicit cc si op= folosind copy-and-swap + clone().
 class Cadru {
     std::string titlu;
     double latime;
     double inaltime;
     std::vector<std::unique_ptr<SubiectVizual> > subiecte; // pointer la baza
-    // Observer pattern: raw pointers, observatorii nu sunt detinuti de Cadru.
-    // Lifetime-ul lor e gestionat in afara (vezi observator_cadru.h).
+    // observer pattern: raw pointers, observatorii nu sunt detinuti de Cadru
+    // lifetime ul e gestionat in afara (observator_cadru.h)
     std::vector<ObservatorCadru *> observatori;
 
 public:
@@ -76,19 +74,19 @@ public:
 
     void adaugaSubiect(std::unique_ptr<SubiectVizual> subiect);
 
-    // Observer pattern: ataseaza/detaseaza ascultatori la modificarile cadrului.
-    // Observatorii primesc notificari sincron, in ordinea atasarii.
+    // observer pattern: ataseaza/detaseaza ascultatori la modificarile cadrului
+    // observatorii primesc notif sincron in ordinea atasarii
     void adaugaObservator(ObservatorCadru *obs);
 
     void eliminaObservatori();
 
-    // apeleaza contributieCompozitionala() virtual prin pointer de baza.
-    // Foloseste stilul implicit (StilCinematic) - filozofie neutra.
+    // apeleaza contributieCompozitionala() virtual prin pointer de baza
+    // Foloseste stilul implicit (StilCinematic)
     double calculeazaScorCompozitie() const;
 
-    // Strategy: scorul agregat dupa filozofia unui stil cinematografic
-    // (Hollywood clasic, Wes Anderson, documentar). Stilul moduleaza atat
-    // ponderea scorului individual cat si ajustarea pe tipul de compozitie.
+    // strategy: scorul agregat dupa filozofia unui stil cinematografic
+    // (Hollywood clasic, Wes Anderson, documentar)
+    // poti face ponderea scorului individual cat si ajustarea pe tipul de compozitie
     double calculeazaScorCompozitie(const StilCompozitional &stil) const;
 
     std::string interpreteazaScor() const;
@@ -108,18 +106,18 @@ public:
     // distributia greutatii vizuale pe cele patru zone ale cadrului
     Echilibru analizeazaEchilibru() const;
 
-    // Statistici descriptive peste importantele subiectelor (clasa template).
-    // Folosit pentru a evalua daca un cadru are subiecte "echivalente ca pondere"
-    // sau daca exista un protagonist clar mai important decat restul.
+    // statistici descriptive peste importantele subiectelor (clasa template)
+    // folosit pentru a evalua daca un cadru are subiecte echivalente ca pondere
+    // sau daca exista un protagonist clar mai important decat restul
     Statistici<int> statisticiImportanta() const;
 
-    // Functie template: extrage din cadru toate subiectele de tipul dat,
-    // intorse ca pointeri non-owning. Folosit pentru analize specifice pe
-    // tipuri concrete (de ex. doar actorii sau doar sursele de lumina).
-    //
-    // Definita inline aici (functie template - instantiere la utilizare).
-    // Cerere pe T: trebuie sa derive din SubiectVizual pentru ca dynamic_cast
-    // sa fie posibil semantic (clasa polimorfica).
+    // functie template: extrage din cadru toate subiectele de tipul dat,
+    // intorse ca pointeri non-owning, folosit pentru analize specifice pe
+    // tipuri concrete (de ex doar actorii sau doar sursele de lumina)
+
+    // def inline aici (functie template - instantiere la utilizare)
+    // cerere pe T: trebuie sa derive din SubiectVizual pentru ca dynamic_cast
+    // sa fie posibil semantic (clasa polimorfica)
     template<typename T>
     std::vector<const T *> extragePeTip() const {
         static_assert(std::is_base_of_v<SubiectVizual, T>,

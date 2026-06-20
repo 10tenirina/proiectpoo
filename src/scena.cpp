@@ -133,12 +133,12 @@ void Scena::adaugaObservatorLaToateCadrele(ObservatorCadru *obs) {
 }
 
 Statistici<double> Scena::statisticiScoruri() const {
-    // colectam scorurile cadrelor in vector si construim Statistici<double>.
+    // colectam scorurile cadrelor in vector si construim Statistici<double>
     std::vector<double> scoruri;
     scoruri.reserve(cadre.size());
     for (const auto &c: cadre)
         scoruri.push_back(c.calculeazaScorCompozitie());
-    return Statistici<double>{std::move(scoruri)};
+    return Statistici{std::move(scoruri)};
 }
 
 Scena Scena::dinFisier(const std::string &numeFisier) {

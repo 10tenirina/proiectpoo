@@ -19,14 +19,14 @@ std::unique_ptr<SubiectVizual> SursaLumina::clone() const {
 double SursaLumina::contributieCompozitionala(double W, double H) const {
     double scor = scorBazaCompozitie(W, H);
 
-    // bonus: corpul de iluminat e aliniat pe o linie de treime
-    // => devine leading element care incadreaza scena (toleranta intre
-    //    cea a actorului 0.05 si cea a decorului 0.15)
+    // bonus corpul de iluminat e aliniat pe o linie de treime
+    // devine leading element care incadreaza scena (toleranta intre
+    // cea a actorului 0.05 si cea a decorului 0.15)
     if (esteAliniat(W, H, 0.12))
         scor = std::min(100.0, scor + 12.0);
 
-    // bonus: lumina directionala (laterala sau de contur) modeleaza
-    // volumele si da profunzime; lumina frontala aplatizeaza imaginea
+    // bonus lumina directionala (laterala sau de contur) modeleaza
+    // volumele si da profunzime, lumina frontala aplatizeaza imaginea
     if (directie == "laterala" || directie == "contra")
         scor = std::min(100.0, scor + 10.0);
 

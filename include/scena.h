@@ -13,8 +13,8 @@
 
 class ObservatorCadru;
 
-// Secventa de cadre pentru aceeasi scena dintr-un film.
-// Permite compararea variantelor de cadru si alegerea celei mai bune compozitii.
+// secventa de cadre pentru aceeasi scena
+// permite compararea variantelor de cadru si alegerea celei mai bune compozitii
 class Scena {
     std::string titlu;
     std::vector<Cadru> cadre;
@@ -48,23 +48,22 @@ public:
 
     void adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizual> subiect);
 
-    // Strategy: afiseaza scorul cadrului dat sub fiecare stil cinematografic
-    // din lista. Folosit pentru a arata cum un cadru "bun pentru Hollywood"
-    // poate fi "slab pentru Wes Anderson" si invers.
+    // strategy: afiseaza scorul cadrului dat sub fiecare stil cinematografic
+    // din lista, arata diferente intre tipuri dif de compozitii
     // Primeste pointeri non-owning (consistent cu RegistruStiluri::toateStilurile).
     void evalueazaCadruCuStiluri(
         std::size_t index,
         const std::vector<const StilCompozitional *> &stiluri) const;
 
-    // Observer: ataseaza acelasi observator la fiecare cadru din scena.
-    // Folosit la setup, inainte de a intra in modul interactiv, pentru ca
-    // orice modificare a unui cadru sa fie raportata in jurnal sau monitor.
+    // observer: ataseaza acelasi observator la fiecare cadru din scena
+    // folosit la setup, inainte de a intra in modul interactiv, pentru ca
+    // orice modificare a unui cadru sa fie raportata in jurnal sau monitor
     void adaugaObservatorLaToateCadrele(ObservatorCadru *obs);
 
-    // Statistici descriptive peste scorurile de compozitie ale cadrelor.
-    // Clasa template: Statistici<double>. Folosit pentru a evalua omogenitatea
+    // statistici descriptive peste scorurile de compozitie
+    // cls template: Statistici<double>, folosit pentru a evalua omogenitatea
     // scorurilor: o scena cu deviation mare are cadre inegale, una cu mediana
-    // mare are cele mai multe cadre bune.
+    // mare are cele mai multe cadre bune
     Statistici<double> statisticiScoruri() const;
 
     static Scena dinFisier(const std::string &numeFisier);

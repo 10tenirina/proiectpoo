@@ -7,20 +7,19 @@
 #include <utility>
 #include <vector>
 
-// Clasa template: statistici descriptive (min/max/medie/mediana) peste o
-// colectie de valori comparabile.
-//
-// Atribut dependent de T: std::vector<T> valori_.
-// Metode care depind de T: minim(), maxim(), mediana() (intorc T sau double).
-//
-// Cerinte pe T: trebuie sa fie comparable (operator<) si convertible la double
-// pentru medie. Tipurile aritmetice satisfac aceste cerinte automat.
-//
-// Instantieri in proiect: Statistici<double> (peste scoruri de compozitie)
-// si Statistici<int> (peste importante de subiecte).
-//
-// Definita complet in header (header-only) deoarece e template - fara
-// instantieri explicite, compilatorul le creaza la nevoie.
+// cls template: statistici descriptive (min/max/medie/mediana)
+
+// atribut dependent de T: std::vector<T> valori_
+// metode care depind de T: minim(), maxim(), mediana() (intorc T sau double)
+
+// cerinte pe T: trebuie sa fie comparable (operator<) si convertible la double
+// pentru medie, tipurile aritmetice satisfac aceste cerinte automat
+
+// instantieri in proiect: Statistici<double> (peste scoruri de compozitie)
+// si Statistici<int> (peste importante de subiecte)
+
+// def (header-only) deoarece e template - fara
+// instantieri explicite, compilatorul le creaza la nevoie
 template<typename T>
 class Statistici {
     std::vector<T> valori_;
@@ -53,8 +52,8 @@ public:
         return suma / static_cast<double>(valori_.size());
     }
 
-    // Intoarce double pentru consistenta cu medie() si pentru cazul size par
-    // cu T=int (de ex. {1,2} -> 1.5, nu 1).
+    // intoarce double pentru consistenta cu medie() si pentru cazul size par
+    // cu T=int (de ex {1,2} -> 1.5, nu 1)
     double mediana() const {
         if (valori_.empty())
             throw std::out_of_range("Statistici::mediana pe colectie goala");

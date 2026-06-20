@@ -2,9 +2,9 @@
 #include <ostream>
 #include <cmath>
 
-// Coordonate 2D (x, y) intr-un cadru cinematografic.
-// Folosit ca origine a bounding box-ului in SubiectVizual
-// si ca reprezentare a power points in calculul scorului.
+// coord 2D (x, y) intr un cadru
+// folosit ca origine a bounding box-ului in SubiectVizual
+// si ca reprezentare a power points in calcul scor
 class Punct {
     double x;
     double y;

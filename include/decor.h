@@ -3,12 +3,12 @@
 #include <memory>
 #include <string>
 
-// Element focal de tip scenografic (decor, arhitectura, mobilier).
-// Decorul contribuie la compozitie prin leading lines si frame-within-frame:
+// elem focal de tip scenografic (decor, arhitectura, mobilier)
+// decorul contribuie la compozitie prin leading lines si frame-within-frame
 // daca bounding box-ul sau taie o linie de treime, ghideaza privirea
-// spre subiectul principal => bonus la scor.
+// spre subiectul principal => bonus la scor
 class Decor : public SubiectVizual {
-    std::string tipDecor; // "arhitectural" | "mobilier" | "vegetal" | etc.
+    std::string tipDecor; // "arhitectural" / "mobilier" / "vegetal" / etc
 
     void afiseazaDetalii(std::ostream &os) const override;
 

@@ -2,10 +2,6 @@
 #include "cadru.h"   // pentru valorile concrete ale enum-ului TipCompozitie
 #include <algorithm>
 
-// ============================================================
-// StilCinematic - implicit, neutru
-// ============================================================
-
 StilCinematic::StilCinematic()
     : StilCompozitional{"cinematic"} {
 }
@@ -26,9 +22,6 @@ void StilCinematic::afiseazaDescriere(std::ostream &os) const {
     os << "[" << numeStil() << "] stil neutru, rule of thirds clasica fara ponderi";
 }
 
-// ============================================================
-// StilHollywoodClasic - rule of thirds stricta, centrarea penalizata
-// ============================================================
 
 StilHollywoodClasic::StilHollywoodClasic()
     : StilCompozitional{"hollywood_clasic"} {
@@ -60,10 +53,6 @@ void StilHollywoodClasic::afiseazaDescriere(std::ostream &os) const {
             << "compozitia centrata e penalizata (cinema studio-system)";
 }
 
-// ============================================================
-// StilWesAnderson - simetrie centrala perfecta
-// ============================================================
-
 StilWesAnderson::StilWesAnderson()
     : StilCompozitional{"wes_anderson"} {
 }
@@ -94,10 +83,6 @@ void StilWesAnderson::afiseazaDescriere(std::ostream &os) const {
     os << "[" << numeStil() << "] simetrie centrala perfecta; "
             << "rule of thirds este considerata plata";
 }
-
-// ============================================================
-// StilDocumentar - cinema verite, autenticitatea primeaza
-// ============================================================
 
 StilDocumentar::StilDocumentar()
     : StilCompozitional{"documentar"} {

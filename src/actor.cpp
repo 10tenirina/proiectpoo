@@ -24,7 +24,7 @@ double Actor::contributieCompozitionala(double W, double H) const {
         scor = std::min(100.0, scor + 15.0);
 
     // bonus nose room: actorul priveste spre interiorul cadrului
-    // dreapta din stanga cadrului sau stanga din dreapta cadrului
+    // dr din stg cadrului sau stg din dr cadrului
     const double cx = getCentru().getX();
     const bool privesteSpreInterior =
             (directiePrivire == "dreapta" && cx < W / 2.0) ||

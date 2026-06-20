@@ -3,9 +3,6 @@
 #include "subiect_vizual.h"
 #include "stil_compozitional.h"
 
-// ============================================================
-// LoggerCadru
-// ============================================================
 
 LoggerCadru::LoggerCadru(std::ostream &out)
     : out_{out} {
@@ -17,10 +14,6 @@ void LoggerCadru::laAdaugareSubiect(const Cadru &cadru, const SubiectVizual &sub
             << "\" (importanta " << subiect.getImportanta() << "/10)\n";
 }
 
-// ============================================================
-// MonitorCompozitie
-// ============================================================
-
 MonitorCompozitie::MonitorCompozitie(std::ostream &out,
                                      const StilCompozitional &stil,
                                      double prag)
@@ -28,7 +21,7 @@ MonitorCompozitie::MonitorCompozitie(std::ostream &out,
 }
 
 void MonitorCompozitie::laAdaugareSubiect(const Cadru &cadru, const SubiectVizual &subiect) {
-    // calculul foloseste stilul cu care a fost configurat monitorul:
+    // calculul foloseste stilul cu care a fost configurat monitorul
     // putem urmari acelasi cadru cu mai multi monitori, fiecare cu alt stil
     const double scor = cadru.calculeazaScorCompozitie(stil_);
     out_ << "[MONITOR/" << stil_.numeStil() << "] scor dupa adaugare \""

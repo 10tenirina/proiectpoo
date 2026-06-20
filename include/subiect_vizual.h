@@ -5,21 +5,21 @@
 #include "punct.h"
 #include "exceptii.h"
 
-// Clasa abstracta de baza pentru orice element focal dintr-un cadru.
-// Defineste interfata comuna (bounding box, importanta, calcule compozitionale).
-// Nu poate fi instantiata direct - deriva Actor, Recuzita, Decor.
-//
+// cls abstracta de baza pentru orice elem focal dintr un cadru
+// defineste interfata comuna (bounding box, importanta, calcule compoz)
+
 // NVI (Non-Virtual Interface):
 //   operator<< este non-virtual si public, dar intern apeleaza
-//   afiseazaDetalii() care este virtuala pura si privata.
-//   Astfel fiecare clasa derivata controleaza afisarea proprie,
-//   fara ca operatorul sa fie virtual.
+//   afiseazaDetalii() care este virtuala pura si privata
+//   asa fiecare clasa derivata controleaza afisarea proprie,
+//   fara ca operatorul sa fie virtual
+
 class SubiectVizual {
     std::string denumire;
     Punct coltStangaSus;
     double latime;
     double inaltime;
-    int importanta; // [1, 10]
+    int importanta; // [1 , 10]
 
     // contor static: cate subiecte au fost create in total
     static int numarSubiecteCreate;
@@ -73,7 +73,7 @@ public:
 
     bool seSuprapuneCu(const SubiectVizual &alt) const;
 
-    // static: numar total de subiecte create de la lansarea programului
+    // static: nr tot de subiecte create de la lansarea programului
     static int getNumarSubiecteCreate();
 
     // NVI: non-virtual, apeleaza intern afiseazaDetalii() (virtual)

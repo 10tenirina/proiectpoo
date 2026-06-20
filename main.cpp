@@ -4,10 +4,10 @@
 #include <cstddef>
 #include <vector>
 #include "scena.h"
-#include "actor.h"    // necesar pentru dynamic_cast si extragePeTip<Actor>
-#include "decor.h"    // necesar pentru adaugaSubiect manual
-#include "recuzita.h" // necesar pentru demo Observer
-#include "sursa_lumina.h"  // necesar pentru extragePeTip<SursaLumina>
+#include "actor.h"
+#include "decor.h"    // trb pentru adaugaSubiect manual
+#include "recuzita.h" // trb pentru demo Observer
+#include "sursa_lumina.h"  // trb pentru extragePeTip<SursaLumina>
 #include "stil_compozitional.h"
 #include "stiluri.h"
 #include "observator_cadru.h"
@@ -29,10 +29,9 @@ namespace {
                 << "Alege optiunea: ";
     }
 
-    // Bucla de meniu condusa de EOF: la stdin gol (tastatura.txt gol) iese imediat,
-    // deci nu blocheaza niciodata CI-ul.
+    // Bucla de meniu condusa de EOF: la stdin gol (tastatura.txt gol) iese imediat
     // Singleton-ul RegistruStiluri e accesat direct cand e nevoie - nu mai pasam
-    // un vector de stiluri ca parametru.
+    // un vector de stiluri ca parametru
     void ruleazaMeniu(Scena &scena) {
         afiseazaMeniu();
         int optiune = 0;
@@ -105,7 +104,7 @@ namespace {
             std::cout << "Alege optiunea: ";
         }
     }
-} // namespace
+}
 
 int main() {
     std::cout << "======= Rule of Thirds Analyzer =======\n\n";
@@ -124,13 +123,13 @@ int main() {
         // clasament cadre dupa scor (std::sort)
         scena.afiseazaClasament();
 
-        // Strategy: aceleasi cadre vazute prin filozofii cinematografice diferite.
-        // Un cadru centrat e "slab" pentru Hollywood dar excelent pentru Wes Anderson.
-        // Stilurile sunt centralizate in Singleton-ul RegistruStiluri.
+        // strategy: aceleasi cadre vazute prin stiluri diferite
+        // un cadru centrat e "slab" pentru Hollywood dar excelent pentru Wes Anderson
+        // stilurile sunt centralizate in Singleton-ul RegistruStiluri
         std::cout << "--- Strategy: scoruri pe fiecare cadru cu fiecare stil ---\n";
         const auto stiluriDemo = RegistruStiluri::get().toateStilurile();
         for (std::size_t i = 0; i < stiluriDemo.size(); ++i) {
-            // demonstram si polimorfismul clone() prin pointer de baza
+            // dem si polimorfismul clone() prin pointer de baza
             auto copie = stiluriDemo[i]->clone();
             std::cout << "  Stil disponibil " << (i + 1) << ": " << *copie << "\n";
         }
@@ -138,7 +137,7 @@ int main() {
         scena.evalueazaCadruCuStiluri(0, stiluriDemo);
         scena.evalueazaCadruCuStiluri(1, stiluriDemo);
 
-        // analiza de compozitie pe cadrul recomandat: tip + echilibru vizual
+        // analiza de compozitie pe cadrul recomandat tip + echilibru vizual
         const Cadru &recomandat = scena.cadruRecomandat();
         std::cout << "Tip compozitie cadru recomandat: "
                   << descriereTipCompozitie(recomandat.tipCompozitie()) << "\n";
@@ -234,10 +233,10 @@ int main() {
         std::cout << "[Eroare test] " << e.what() << "\n";
     }
 
-    // Observer: notificari live la modificarea cadrului.
-    // Logger-ul scrie pe stderr (separat de output principal),
-    // monitorul recalculeaza scorul si avertizeaza daca scade sub prag.
-    // Monitorul foloseste stilul curent din Singleton (cinematic, default).
+    // observer: notificari live la modificarea cadrului
+    // logger-ul scrie pe stderr (separat de output principal),
+    // monitorul recalculeaza scorul si avertizeaza daca scade sub prag
+    // monitorul foloseste stilul curent din Singleton (cinematic, default)
     std::cout << "\n--- Observer: notificari live la adaugare subiect ---\n";
     try {
         LoggerCadru loggerDemo{std::cerr};
@@ -268,7 +267,7 @@ int main() {
         std::cout << "[Eroare demo observer] " << e.what() << "\n";
     }
 
-    // Singleton: registru central de stiluri + stare de sesiune.
+    // singleton: registru central de stiluri + stare de sesiune
     std::cout << "\n--- Singleton: RegistruStiluri ---\n";
     {
         auto &reg = RegistruStiluri::get();
@@ -290,7 +289,7 @@ int main() {
                 << reg.numarCadreAnalizate() << "\n";
     }
 
-    // Clase si functii template: Statistici<T> si Cadru::extragePeTip<T>.
+    // clase si functii template Statistici<T> si Cadru::extragePeTip<T>
     std::cout << "\n--- Statistici<double>: scoruri scena ---\n";
     try {
         Scena scenaStats = Scena::dinFisier("assets/scena.txt");
@@ -313,15 +312,15 @@ int main() {
                 << "  rezumat: " << statsImp << "\n";
 
         std::cout << "\n--- Functie template Cadru::extragePeTip<T> ---\n";
-        // Instantiere 1: extragem doar actorii (avem nevoie de directiaPrivirii)
+        // instantiere 1: extragem doar actorii (avem nevoie de directiaPrivirii)
         const auto actoriRec = cadruStats.extragePeTip<Actor>();
         std::cout << "Actori in cadrul \"" << cadruStats.getTitlu()
                 << "\" (" << actoriRec.size() << "):\n";
         for (const Actor *a: actoriRec)
             std::cout << "  " << a->getDenumire()
                     << " (priveste \"" << a->getDirectiePrivire() << "\")\n";
-        // Instantiere 2: extragem sursele de lumina (am vrea directia, dar
-        // SursaLumina nu expune getter pentru ea -- arătăm doar denumirile)
+        // instantiere 2: extragem sursele de lumina (am vrea directia, dar
+        // SursaLumina nu expune getter pentru ea, aratam doar denumirile)
         const auto surseRec = cadruStats.extragePeTip<SursaLumina>();
         std::cout << "Surse de lumina in acelasi cadru ("
                 << surseRec.size() << "):\n";
@@ -333,20 +332,21 @@ int main() {
         std::cout << "[Eroare statistici] " << e.what() << "\n";
     }
 
-    // Mod interactiv: comenzi din stdin (redirectate din tastatura.txt in CI).
-    // Meniul acceseaza Singleton-ul direct cand are nevoie de stiluri,
-    // deci nu mai pasam un vector ca parametru.
+    // mod interactiv: comenzi din stdin (redirectate din tastatura.txt in CI)
+    // meniul acceseaza Singleton-ul direct cand are nevoie de stiluri
+    // deci nu mai pasam un vector ca parametru
     try {
-        // observatorii referă Singleton-ul prin stilCurent() la momentul
-        // construirii. Schimbarile ulterioare ale stilului curent (optiune 7)
-        // nu afecteaza monitorul deja instalat - el ramane pe stilul initial.
+        // observatorii refera Singleton-ul prin stilCurent() la momentul
+        // construirii, schimbarile ulterioare ale stilului curent (optiune 7)
+        // nu afecteaza monitorul deja instalat, el ramane pe stilul init
         LoggerCadru loggerMeniu{std::cerr};
         MonitorCompozitie monitorMeniu{
-            std::cout, RegistruStiluri::get().stilCurent(), 50.0};
+            std::cout, RegistruStiluri::get().stilCurent(), 50.0
+        };
 
         Scena scenaInteractiva = Scena::dinFisier("assets/scena.txt");
-        // Observer: orice optiune 5 din meniu va declansa notificari prin
-        // logger si monitor pe cadrul vizat.
+        // observer: orice optiune 5 din meniu va declansa notificari prin
+        // logger si monitor pe cadrul vizat
         scenaInteractiva.adaugaObservatorLaToateCadrele(&loggerMeniu);
         scenaInteractiva.adaugaObservatorLaToateCadrele(&monitorMeniu);
 

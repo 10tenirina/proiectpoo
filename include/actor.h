@@ -3,12 +3,11 @@
 #include <memory>
 #include <string>
 
-// Element focal de tip personaj/actor.
-// Adauga directia privirii, care influenteaza scorul compozitional:
-// un actor care priveste spre interiorul cadrului (nose room) e
-// mai bine compus decat unul care priveste spre margine.
+
+// adauga directia privirii, influenteaza scor compozitional
+// un actor care priveste spre interiorul cadrului (nose room) e mai bine
 class Actor : public SubiectVizual {
-    std::string directiePrivire; // "stanga" | "dreapta" | "camera"
+    std::string directiePrivire; // "stanga" /  "dreapta" / "camera"
 
     void afiseazaDetalii(std::ostream &os) const override;
 

@@ -2,11 +2,11 @@
 #include "subiect_vizual.h"
 #include <memory>
 
-// Element focal de tip obiect important (prop).
-// Recuzita statica e plasata intentionat => mic bonus la scor.
-// Recuzita dinamica (ex: masina in miscare) are pozitia mai putin controlata.
+// element focal de tip obiect important (prop)
+// recuzita statica e plasata intentionat => mic bonus la scor
+// recuzita dinamica (ex: masina in miscare) are pozitia mai putin controlata
 class Recuzita : public SubiectVizual {
-    bool esteStatic_; // true = prop fix; false = element in miscare
+    bool esteStatic_; // true = prop fix , false = element in miscare
 
     void afiseazaDetalii(std::ostream &os) const override;
 

@@ -1,82 +1,100 @@
 # Rule of Thirds Analyzer
- 
+
 Proiect realizat în cadrul cursului de **Programare Orientată pe Obiecte** (Facultatea de Matematică și Informatică, UniBuc).
- 
+
 ## Descriere
- 
+
 **Rule of thirds** este una dintre cele mai folosite tehnici de compoziție în cinematografie și fotografie. Ideea e simplă: împarți cadrul în 9 părți egale cu două linii orizontale și două verticale, și plasezi elementele importante ale scenei pe aceste linii sau la intersecțiile lor — numite **power points**. Rezultatul e o imagine mai dinamică și mai naturală decât dacă ai centra subiectul.
- 
-Acest program analizează cadre cinematografice și evaluează cât de bine respectă elementele din scenă regula treimilor. Fiecare element focal (actor, obiect important) este reprezentat printr-un bounding box, iar programul calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element.
- 
-## Clase
- 
-- **`Punct`** — coordonate 2D (x, y) în cadrul filmului
-- **`SubiectVizual`** — element focal dintr-o scenă: actor, obiect important etc., definit printr-un bounding box și un nivel de importanță (1–10)
-- **`Cadru`** — un shot cinematografic; conține mai multe subiecte vizuale și calculează scorul de compoziție al întregului cadru
-- **`Scena`** — o secvență de cadre pentru aceeași scenă; permite compararea variantelor și alegerea celei mai bune compoziții
- 
-## Funcționalități
- 
-- calcularea scorului de compoziție (0–100) pentru un cadru, ponderat cu importanța fiecărui subiect
-- verificarea alinierii subiectelor pe liniile de treime
-- detectarea suprapunerilor între subiecte
-- identificarea protagonistului (subiectul cu importanța cea mai mare)
-- compararea mai multor variante de cadru și recomandarea celei mai bune
-- citirea cadrelor de la tastatură sau din fișier
+
+Programul analizează cadre cinematografice și evaluează cât de bine respectă elementele din scenă rule of thirds.
+Fiecare element focal (actor, recuzită, decor, sursă de lumină) este reprezentat printr-un bounding box, iar programul
+calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element. Mai
+mult, scorul poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson,
+documentar, cinematic neutru) — același cadru poate fi „bun pentru Hollywood” și „slab pentru Wes Anderson”.
 
 ## Format fișiere de date
 
-scena.txt:
+**`scena.txt`** — o scenă cu mai multe cadre:
+
+```
 <titlu_scena> <numar_cadre>
-apoi, pentru fiecare cadru:
-<titlu_cadru> <latime> <inaltime> <numar_subiecte>
-<numar_subiecte> linii de subiecte
+ 
+<titlu_cadru_1> <latime> <inaltime> <numar_subiecte>
+<numar_subiecte> linii de subiecte (vezi mai jos)
+ 
+<titlu_cadru_2> <latime> <inaltime> <numar_subiecte>
+...
+```
 
-cadru_test.txt:
-un singur cadru (fără header de scenă), aceeași linie de subiect.
+**`cadru_test.txt`** — un singur cadru, fără header de scenă, restul identic.
 
-Linie de subiect:
+**Linie de subiect** (token-cu-token, separate prin spațiu):
+
+```
 <denumire> <x> <y> <latime> <inaltime> <Tip> <importanta> <camp_specific>
+```
 
-Tip camp_specific
-  -----------  --------------------------------------------
-Actor directiePrivire : stanga | dreapta | camera
-Recuzita mobilitate      : static | dinamic
-Decor tipDecor        : arhitectural | mobilier | vegetal | ...
-SursaLumina directie        : laterala | frontala | contra
+| Tip           | `camp_specific`                                           |
+|---------------|-----------------------------------------------------------|
+| `Actor`       | `stanga` / `dreapta` / `camera` (direcția privirii)       |
+| `Recuzita`    | `static` / `dinamic` (mobilitate)                         |
+| `Decor`       | `arhitectural` / `mobilier` / `vegetal` / ... (tip decor) |
+| `SursaLumina` | `laterala` / `frontala` / `contra` (direcția luminii)     |
 
-x, y = colțul stânga-sus al bounding box-ului (pixeli)
-latime, inaltime = dimensiunile bounding box-ului (pixeli)
-importanta = întreg în [1, 10]; ponderează subiectul în scorul cadrului
+- `x`, `y` = colțul stânga-sus al bounding box-ului (în pixeli)
+- `latime`, `inaltime` = dimensiunile bounding box-ului
+- `importanta` = întreg în `[1, 10]`, ponderează subiectul în scorul cadrului
+  Vezi `assets/scena.txt` și `assets/cadru_test.txt` pentru exemple complete.
 
 ## Mod interactiv
 
-Programul citește comenzi din `std::cin`. Le poți tasta direct sau le poți
-pune în `tastatura.txt` și rula cu redirectare:
+Programul citește comenzi din `std::cin`. Le poți tasta direct sau le pui în `tastatura.txt` și rulezi cu redirectare:
 
-    ./oop < tastatura.txt
+```sh
+./oop < tastatura.txt
+```
 
-Comenzi (o comandă pe linie):
+### Comenzi (o comandă pe linie)
 
-1 Afișează raportul scenei (scor și interpretare pe fiecare cadru,
-scor mediu, cadru recomandat).
-2 Afișează clasamentul cadrelor, ordonate descrescător după scor,
-cu tipul de compoziție al fiecăruia.
-3 i j Compară side-by-side cadrele cu indecșii i și j (scor, tip
-compoziție, echilibru vizual) și spune care e mai bine compus.
-4 i Analiză detaliată a cadrului i: scorul fiecărui subiect în
-parte plus sfatul lui de compoziție, avertismente de
-suprapunere, apoi tipul de compoziție și echilibrul vizual.
-(Spre deosebire de 3, care compară două cadre la nivel de
-ansamblu, 4 intră în profunzime într-un singur cadru.)
-5 i <subiect> Adaugă un subiect în cadrul i. <subiect> se scrie în același
-format ca în fișierele de scenă:
-denumire x y latime inaltime Tip importanta camp_specific
-ex: Reflector 640 360 80 120 SursaLumina 6 laterala
-0 Iese din modul interactiv.
+| Comandă         | Efect                                                                                                                                  |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------------------|
+| `1`             | Raport scena: scor și interpretare pe fiecare cadru, scor mediu, cadru recomandat.                                                     |
+| `2`             | Clasament cadrelor ordonate descrescător după scor, cu tipul de compoziție.                                                            |
+| `3 i j`         | Compară side-by-side cadrele `i` și `j` (scor, tip compoziție, echilibru vizual).                                                      |
+| `4 i`           | Analiză detaliată a cadrului `i`: scorul fiecărui subiect + sfat, suprapuneri, tip compoziție, echilibru.                              |
+| `5 i <subiect>` | Adaugă un subiect în cadrul `i`. `<subiect>` în același format ca în fișiere (vezi mai sus). Declanșează automat observatorii atașați. |
+| `6 i`           | Evaluează cadrul `i` cu toate cele 4 stiluri cinematografice și afișează scorurile comparativ.                                         |
+| `7 nume_stil`   | Schimbă stilul global al sesiunii. Stiluri disponibile: `cinematic`, `hollywood_clasic`, `wes_anderson`, `documentar`.                 |
+| `8`             | Statistici peste scorurile cadrelor din scenă: număr, min, max, medie, mediană.                                                        |
+| `0`             | Ieșire din modul interactiv.                                                                                                           |
 
-Indecșii cadrelor încep de la 0. Un index invalid produce un mesaj de eroare,
-nu oprește programul. La stdin gol, programul iese imediat (nu blochează).
+**Exemplu pentru `5 i <subiect>`:**
+
+```
+5 0 Reflector 640 360 80 120 SursaLumina 6 laterala
+```
+
+**Observații:**
+
+- Indecșii cadrelor încep de la `0`.
+- Un index invalid produce un mesaj de eroare, nu oprește programul.
+- La `stdin` gol, programul iese imediat (nu blochează CI-ul).
+- Opțiunea `5` declanșează observatorii instalați la pornire: un logger pe `stderr` și un monitor de compoziție pe
+  `stdout`.
+
+### Exemplu de `tastatura.txt`
+
+```
+1
+2
+6 0
+6 1
+7 wes_anderson
+8
+5 0 Reflector 640 360 80 120 SursaLumina 6 laterala
+4 0
+0
+```
 
 ## Voi primi notă pentru că am pus titlu și descriere
 
