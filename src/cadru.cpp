@@ -214,6 +214,16 @@ Echilibru Cadru::analizeazaEchilibru() const {
     return e;
 }
 
+Statistici<int> Cadru::statisticiImportanta() const {
+    // colectam importantele subiectelor in vector si construim Statistici<int>.
+    // Daca cadrul e gol, vectorul e gol -- Statistici tolereaza asta prin gol().
+    std::vector<int> importante;
+    importante.reserve(subiecte.size());
+    for (const auto &sv: subiecte)
+        importante.push_back(sv->getImportanta());
+    return Statistici<int>{std::move(importante)};
+}
+
 void Cadru::comparaCu(const Cadru &alt) const {
     std::cout << "--- Comparatie cadre ---\n";
     std::cout << "  A: \"" << titlu << "\" | scor "

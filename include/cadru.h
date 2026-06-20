@@ -4,8 +4,10 @@
 #include <memory>
 #include <ostream>
 #include <istream>
+#include <type_traits>
 #include "subiect_vizual.h"
 #include "exceptii.h"
+#include "statistici.h"
 
 class StilCompozitional; // forward decl pentru Strategy pattern
 class ObservatorCadru;   // forward decl pentru Observer pattern
@@ -105,6 +107,31 @@ public:
 
     // distributia greutatii vizuale pe cele patru zone ale cadrului
     Echilibru analizeazaEchilibru() const;
+
+    // Statistici descriptive peste importantele subiectelor (clasa template).
+    // Folosit pentru a evalua daca un cadru are subiecte "echivalente ca pondere"
+    // sau daca exista un protagonist clar mai important decat restul.
+    Statistici<int> statisticiImportanta() const;
+
+    // Functie template: extrage din cadru toate subiectele de tipul dat,
+    // intorse ca pointeri non-owning. Folosit pentru analize specifice pe
+    // tipuri concrete (de ex. doar actorii sau doar sursele de lumina).
+    //
+    // Definita inline aici (functie template - instantiere la utilizare).
+    // Cerere pe T: trebuie sa derive din SubiectVizual pentru ca dynamic_cast
+    // sa fie posibil semantic (clasa polimorfica).
+    template<typename T>
+    std::vector<const T *> extragePeTip() const {
+        static_assert(std::is_base_of_v<SubiectVizual, T>,
+                      "extragePeTip<T> functioneaza doar pe derivatele lui SubiectVizual");
+        std::vector<const T *> rezultat;
+        for (const auto &sv: subiecte) {
+            // dynamic_cast prin pointer de baza: intoarce nullptr daca tipul nu se potriveste
+            if (const T *ptr = dynamic_cast<const T *>(sv.get()))
+                rezultat.push_back(ptr);
+        }
+        return rezultat;
+    }
 
     // raport comparativ side-by-side intre cadrul curent si altul
     void comparaCu(const Cadru &alt) const;

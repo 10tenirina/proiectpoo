@@ -9,6 +9,7 @@
 #include "subiect_vizual.h"
 #include "exceptii.h"
 #include "stil_compozitional.h"
+#include "statistici.h"
 
 class ObservatorCadru;
 
@@ -50,14 +51,21 @@ public:
     // Strategy: afiseaza scorul cadrului dat sub fiecare stil cinematografic
     // din lista. Folosit pentru a arata cum un cadru "bun pentru Hollywood"
     // poate fi "slab pentru Wes Anderson" si invers.
+    // Primeste pointeri non-owning (consistent cu RegistruStiluri::toateStilurile).
     void evalueazaCadruCuStiluri(
         std::size_t index,
-        const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) const;
+        const std::vector<const StilCompozitional *> &stiluri) const;
 
     // Observer: ataseaza acelasi observator la fiecare cadru din scena.
     // Folosit la setup, inainte de a intra in modul interactiv, pentru ca
     // orice modificare a unui cadru sa fie raportata in jurnal sau monitor.
     void adaugaObservatorLaToateCadrele(ObservatorCadru *obs);
+
+    // Statistici descriptive peste scorurile de compozitie ale cadrelor.
+    // Clasa template: Statistici<double>. Folosit pentru a evalua omogenitatea
+    // scorurilor: o scena cu deviation mare are cadre inegale, una cu mediana
+    // mare are cele mai multe cadre bune.
+    Statistici<double> statisticiScoruri() const;
 
     static Scena dinFisier(const std::string &numeFisier);
 

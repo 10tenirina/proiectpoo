@@ -110,14 +110,15 @@ void Scena::adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizua
 
 void Scena::evalueazaCadruCuStiluri(
     std::size_t index,
-    const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) const {
+    const std::vector<const StilCompozitional *> &stiluri) const {
     if (index >= cadre.size())
         throw ExceptieCadruInvalid(
             "index cadru in afara intervalului (" + std::to_string(index) + ")");
     const Cadru &c = cadre[index];
     std::cout << "=== Evaluare cadru \"" << c.getTitlu() << "\" cu "
             << stiluri.size() << " stiluri ===\n";
-    for (const auto &stil: stiluri) {
+    for (const auto *stil: stiluri) {
+        if (stil == nullptr) continue;
         // apel virtual prin pointer de baza: stilul concret decide ponderea
         const double scor = c.calculeazaScorCompozitie(*stil);
         std::cout << "  " << *stil << "\n"   // NVI -> afiseazaDescriere() virtual
@@ -129,6 +130,15 @@ void Scena::evalueazaCadruCuStiluri(
 void Scena::adaugaObservatorLaToateCadrele(ObservatorCadru *obs) {
     for (auto &c: cadre)
         c.adaugaObservator(obs);
+}
+
+Statistici<double> Scena::statisticiScoruri() const {
+    // colectam scorurile cadrelor in vector si construim Statistici<double>.
+    std::vector<double> scoruri;
+    scoruri.reserve(cadre.size());
+    for (const auto &c: cadre)
+        scoruri.push_back(c.calculeazaScorCompozitie());
+    return Statistici<double>{std::move(scoruri)};
 }
 
 Scena Scena::dinFisier(const std::string &numeFisier) {

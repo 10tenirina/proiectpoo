@@ -57,7 +57,7 @@ double StilHollywoodClasic::ajustarePentruTip(TipCompozitie tip, double scorAgre
 
 void StilHollywoodClasic::afiseazaDescriere(std::ostream &os) const {
     os << "[" << numeStil() << "] rule of thirds stricta; "
-       << "compozitia centrata e penalizata (cinema studio-system)";
+            << "compozitia centrata e penalizata (cinema studio-system)";
 }
 
 // ============================================================
@@ -92,7 +92,7 @@ double StilWesAnderson::ajustarePentruTip(TipCompozitie tip, double scorAgregat)
 
 void StilWesAnderson::afiseazaDescriere(std::ostream &os) const {
     os << "[" << numeStil() << "] simetrie centrala perfecta; "
-       << "rule of thirds este considerata plata";
+            << "rule of thirds este considerata plata";
 }
 
 // ============================================================
