@@ -108,6 +108,24 @@ void Scena::adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizua
     cadre[index].adaugaSubiect(std::move(subiect));
 }
 
+void Scena::evalueazaCadruCuStiluri(
+    std::size_t index,
+    const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) const {
+    if (index >= cadre.size())
+        throw ExceptieCadruInvalid(
+            "index cadru in afara intervalului (" + std::to_string(index) + ")");
+    const Cadru &c = cadre[index];
+    std::cout << "=== Evaluare cadru \"" << c.getTitlu() << "\" cu "
+            << stiluri.size() << " stiluri ===\n";
+    for (const auto &stil: stiluri) {
+        // apel virtual prin pointer de baza: stilul concret decide ponderea
+        const double scor = c.calculeazaScorCompozitie(*stil);
+        std::cout << "  " << *stil << "\n"   // NVI -> afiseazaDescriere() virtual
+                << "    scor: " << scor << "/100\n";
+    }
+    std::cout << "\n";
+}
+
 Scena Scena::dinFisier(const std::string &numeFisier) {
     std::ifstream f(numeFisier);
     if (!f.is_open())

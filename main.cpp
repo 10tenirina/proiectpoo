@@ -2,73 +2,92 @@
 #include <fstream>
 #include <memory>
 #include <cstddef>
+#include <vector>
 #include "scena.h"
 #include "actor.h"    // necesar pentru dynamic_cast la Actor
 #include "decor.h"    // necesar pentru adaugaSubiect manual
+#include "stil_compozitional.h"
+#include "stiluri.h"
 
 namespace {
-
-void afiseazaMeniu() {
-    std::cout << "\n=== Meniu interactiv (comenzi din stdin / tastatura.txt) ===\n"
-              << "  1             - afiseaza raportul scenei\n"
-              << "  2             - afiseaza clasamentul cadrelor\n"
-              << "  3 i j         - compara cadrele i si j\n"
-              << "  4 i           - analiza detaliata a cadrului i (scor pe fiecare subiect + tip + echilibru)\n"
-              << "  5 i <subiect> - adauga un subiect in cadrul i\n"
-              << "  0             - iesire\n"
-              << "Alege optiunea: ";
-}
-
-// Bucla de meniu condusa de EOF: la stdin gol (tastatura.txt gol) iese imediat,
-// deci nu blocheaza niciodata CI-ul.
-void ruleazaMeniu(Scena &scena) {
-    afiseazaMeniu();
-    int optiune = 0;
-    while (std::cin >> optiune) {
-        if (optiune == 0) {
-            std::cout << "Iesire din modul interactiv.\n";
-            break;
-        }
-        try {
-            switch (optiune) {
-                case 1:
-                    scena.afiseazaRaport();
-                    break;
-                case 2:
-                    scena.afiseazaClasament();
-                    break;
-                case 3: {
-                    std::size_t i = 0;
-                    std::size_t j = 0;
-                    std::cin >> i >> j;
-                    scena.comparaCadre(i, j);
-                    break;
-                }
-                case 4: {
-                    std::size_t i = 0;
-                    std::cin >> i;
-                    scena.afiseazaAnalizaCadru(i);
-                    break;
-                }
-                case 5: {
-                    std::size_t i = 0;
-                    std::cin >> i;
-                    scena.adaugaSubiectLaCadru(i, creeazaSubiectDinStream(std::cin));
-                    std::cout << "Subiect adaugat in cadrul " << i << ".\n";
-                    break;
-                }
-                default:
-                    std::cout << "Optiune invalida: " << optiune << "\n";
-                    break;
-            }
-        }
-        catch (const ExceptieRuleOfThirds &e) {
-            std::cout << "[Eroare comanda] " << e.what() << "\n";
-        }
-        std::cout << "Alege optiunea: ";
+    // Strategy: instantiaza cele patru stiluri cinematografice disponibile.
+    // Vectorul e construit o singura data si refolosit pentru demo si meniu.
+    std::vector<std::unique_ptr<StilCompozitional> > creeazaStilurile() {
+        std::vector<std::unique_ptr<StilCompozitional> > stiluri;
+        stiluri.push_back(std::make_unique<StilCinematic>());
+        stiluri.push_back(std::make_unique<StilHollywoodClasic>());
+        stiluri.push_back(std::make_unique<StilWesAnderson>());
+        stiluri.push_back(std::make_unique<StilDocumentar>());
+        return stiluri;
     }
-}
 
+    void afiseazaMeniu() {
+        std::cout << "\n=== Meniu interactiv (comenzi din stdin / tastatura.txt) ===\n"
+                << "  1             - afiseaza raportul scenei\n"
+                << "  2             - afiseaza clasamentul cadrelor\n"
+                << "  3 i j         - compara cadrele i si j\n"
+                << "  4 i           - analiza detaliata a cadrului i (scor pe fiecare subiect + tip + echilibru)\n"
+                << "  5 i <subiect> - adauga un subiect in cadrul i\n"
+                << "  6 i           - evalueaza cadrul i cu toate stilurile cinematografice (Strategy)\n"
+                << "  0             - iesire\n"
+                << "Alege optiunea: ";
+    }
+
+    // Bucla de meniu condusa de EOF: la stdin gol (tastatura.txt gol) iese imediat,
+    // deci nu blocheaza niciodata CI-ul.
+    void ruleazaMeniu(Scena &scena,
+                      const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) {
+        afiseazaMeniu();
+        int optiune = 0;
+        while (std::cin >> optiune) {
+            if (optiune == 0) {
+                std::cout << "Iesire din modul interactiv.\n";
+                break;
+            }
+            try {
+                switch (optiune) {
+                    case 1:
+                        scena.afiseazaRaport();
+                        break;
+                    case 2:
+                        scena.afiseazaClasament();
+                        break;
+                    case 3: {
+                        std::size_t i = 0;
+                        std::size_t j = 0;
+                        std::cin >> i >> j;
+                        scena.comparaCadre(i, j);
+                        break;
+                    }
+                    case 4: {
+                        std::size_t i = 0;
+                        std::cin >> i;
+                        scena.afiseazaAnalizaCadru(i);
+                        break;
+                    }
+                    case 5: {
+                        std::size_t i = 0;
+                        std::cin >> i;
+                        scena.adaugaSubiectLaCadru(i, creeazaSubiectDinStream(std::cin));
+                        std::cout << "Subiect adaugat in cadrul " << i << ".\n";
+                        break;
+                    }
+                    case 6: {
+                        std::size_t i = 0;
+                        std::cin >> i;
+                        scena.evalueazaCadruCuStiluri(i, stiluri);
+                        break;
+                    }
+                    default:
+                        std::cout << "Optiune invalida: " << optiune << "\n";
+                        break;
+                }
+            } catch (const ExceptieRuleOfThirds &e) {
+                std::cout << "[Eroare comanda] " << e.what() << "\n";
+            }
+            std::cout << "Alege optiunea: ";
+        }
+    }
 } // namespace
 
 int main() {
@@ -87,6 +106,19 @@ int main() {
 
         // clasament cadre dupa scor (std::sort)
         scena.afiseazaClasament();
+
+        // Strategy: aceleasi cadre vazute prin filozofii cinematografice diferite.
+        // Un cadru centrat e "slab" pentru Hollywood dar excelent pentru Wes Anderson.
+        std::cout << "--- Strategy: scoruri pe fiecare cadru cu fiecare stil ---\n";
+        const auto stiluriDemo = creeazaStilurile();
+        for (std::size_t i = 0; i < stiluriDemo.size(); ++i) {
+            // demonstram si polimorfismul clone() prin pointer de baza
+            auto copie = stiluriDemo[i]->clone();
+            std::cout << "  Stil disponibil " << (i + 1) << ": " << *copie << "\n";
+        }
+        std::cout << "\n";
+        scena.evalueazaCadruCuStiluri(0, stiluriDemo);
+        scena.evalueazaCadruCuStiluri(1, stiluriDemo);
 
         // analiza de compozitie pe cadrul recomandat: tip + echilibru vizual
         const Cadru &recomandat = scena.cadruRecomandat();
@@ -162,7 +194,7 @@ int main() {
                   << " scor copie=" << c2.calculeazaScorCompozitie() << "\n";
 
         Cadru c3("Cadru_alt", 1280.0, 720.0);
-        c3 = c1;        // operator= copy-and-swap
+        c3 = c1; // operator= copy-and-swap
         std::cout << "op=: scor dupa atribuire=" << c3.calculeazaScorCompozitie() << "\n";
 
         // construim un al doilea cadru, deliberat centrat (compozitie slaba),
@@ -179,16 +211,17 @@ int main() {
         scenaTest.adaugaCadru(c1);
         scenaTest.adaugaCadru(c3);
         std::cout << "Scena construita manual, scor mediu: "
-                  << scenaTest.scorMediu() << "/100\n";
-    }
-    catch(const ExceptieRuleOfThirds& e) {
+                << scenaTest.scorMediu() << "/100\n";
+    } catch (const ExceptieRuleOfThirds &e) {
         std::cout << "[Eroare test] " << e.what() << "\n";
     }
 
     // Mod interactiv: comenzi din stdin (redirectate din tastatura.txt in CI)
     try {
         Scena scenaInteractiva = Scena::dinFisier("assets/scena.txt");
-        ruleazaMeniu(scenaInteractiva);
+        // construim stilurile o singura data pentru toata durata meniului
+        const auto stiluri = creeazaStilurile();
+        ruleazaMeniu(scenaInteractiva, stiluri);
     }
     catch (const ExceptieRuleOfThirds &e) {
         std::cout << "[Eroare] " << e.what() << "\n";

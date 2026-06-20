@@ -25,6 +25,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         src/sursa_lumina.cpp
         src/cadru.cpp
         src/scena.cpp
+        src/stil_compozitional.cpp
+        src/stiluri.cpp
         include/exceptii.h
         include/punct.h
         include/subiect_vizual.h
@@ -34,6 +36,8 @@ add_executable(${MAIN_EXECUTABLE_NAME}
         include/sursa_lumina.h
         include/cadru.h
         include/scena.h
+        include/stil_compozitional.h
+        include/stiluri.h
 )
 
 set_compiler_flags(RUN_SANITIZERS ${USE_ASAN} TARGET_NAMES ${MAIN_EXECUTABLE_NAME})

@@ -3,6 +3,8 @@
 #include "recuzita.h"
 #include "decor.h"
 #include "sursa_lumina.h"
+#include "stil_compozitional.h"
+#include "stiluri.h"
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -49,17 +51,28 @@ void Cadru::adaugaSubiect(std::unique_ptr<SubiectVizual> subiect) {
 }
 
 double Cadru::calculeazaScorCompozitie() const {
+    // Stilul implicit: cinematic neutru (preserva comportamentul preexistent).
+    // Static const: instantiere unica, fara overhead la fiecare apel.
+    static const StilCinematic implicit;
+    return calculeazaScorCompozitie(implicit);
+}
+
+double Cadru::calculeazaScorCompozitie(const StilCompozitional &stil) const {
     if (subiecte.empty()) return 0.0;
     double scorTotal = 0.0;
     double ponderaTotal = 0.0;
     for (const auto &sv: subiecte) {
-        // apel virtual prin pointer de baza
-        const double scorSubiect = sv->contributieCompozitionala(latime, inaltime);
+        // apel virtual prin pointer de baza pentru scorul de baza
+        const double scorBaza = sv->contributieCompozitionala(latime, inaltime);
+        // stilul moduleaza scorul individual dupa filozofia proprie
+        const double scorPonderat = stil.ponderaSubiect(*sv, scorBaza);
         const double pondere = static_cast<double>(sv->getImportanta());
-        scorTotal += scorSubiect * pondere;
+        scorTotal += scorPonderat * pondere;
         ponderaTotal += pondere;
     }
-    return scorTotal / ponderaTotal;
+    const double scorAgregat = scorTotal / ponderaTotal;
+    // stilul aplica ultimul ajustaj in functie de tipul dominant de compozitie
+    return stil.ajustarePentruTip(tipCompozitie(), scorAgregat);
 }
 
 std::string Cadru::interpreteazaScor() const {

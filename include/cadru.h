@@ -7,16 +7,20 @@
 #include "subiect_vizual.h"
 #include "exceptii.h"
 
+class StilCompozitional; // forward decl pentru Strategy pattern
+
 // forward declaration - fabrica e definita in cadru.cpp dupa includerea derivatelor
 std::unique_ptr<SubiectVizual> creeazaSubiectDinStream(std::istream &is);
 
 // Tipul de compozitie dominant al unui cadru, dedus din pozitia
 // protagonistului si din distributia subiectelor.
-enum class TipCompozitie {
-    Centrata,         // protagonistul e in centrul cadrului (compozitie plata)
-    ReguliTreimilor,  // protagonistul cade pe/langa un power point
-    Simetrica,        // greutatea vizuala e echilibrata stanga-dreapta
-    Echilibrata       // niciuna dintre cele de mai sus, dar fara dezechilibru major
+// Tipul subiacent explicit (int) permite forward-declararea enum-ului
+// in stil_compozitional.h fara dependenta ciclica.
+enum class TipCompozitie : int {
+    Centrata, // protagonistul e in centrul cadrului (compozitie plata)
+    ReguliTreimilor, // protagonistul cade pe/langa un power point
+    Simetrica, // greutatea vizuala e echilibrata stanga-dreapta
+    Echilibrata // niciuna dintre cele de mai sus, dar fara dezechilibru major
 };
 
 std::string descriereTipCompozitie(TipCompozitie tip);
@@ -66,8 +70,14 @@ public:
 
     void adaugaSubiect(std::unique_ptr<SubiectVizual> subiect);
 
-    // apeleaza contributieCompozitionala() virtual prin pointer de baza
+    // apeleaza contributieCompozitionala() virtual prin pointer de baza.
+    // Foloseste stilul implicit (StilCinematic) - filozofie neutra.
     double calculeazaScorCompozitie() const;
+
+    // Strategy: scorul agregat dupa filozofia unui stil cinematografic
+    // (Hollywood clasic, Wes Anderson, documentar). Stilul moduleaza atat
+    // ponderea scorului individual cat si ajustarea pe tipul de compozitie.
+    double calculeazaScorCompozitie(const StilCompozitional &stil) const;
 
     std::string interpreteazaScor() const;
 

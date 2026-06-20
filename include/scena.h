@@ -8,6 +8,7 @@
 #include "cadru.h"
 #include "subiect_vizual.h"
 #include "exceptii.h"
+#include "stil_compozitional.h"
 
 // Secventa de cadre pentru aceeasi scena dintr-un film.
 // Permite compararea variantelor de cadru si alegerea celei mai bune compozitii.
@@ -37,9 +38,19 @@ public:
 
     // operatii indexate folosite de modul interactiv; arunca daca indexul e invalid
     std::size_t numarCadre() const;
+
     void afiseazaAnalizaCadru(std::size_t index) const;
+
     void comparaCadre(std::size_t i, std::size_t j) const;
+
     void adaugaSubiectLaCadru(std::size_t index, std::unique_ptr<SubiectVizual> subiect);
+
+    // Strategy: afiseaza scorul cadrului dat sub fiecare stil cinematografic
+    // din lista. Folosit pentru a arata cum un cadru "bun pentru Hollywood"
+    // poate fi "slab pentru Wes Anderson" si invers.
+    void evalueazaCadruCuStiluri(
+        std::size_t index,
+        const std::vector<std::unique_ptr<StilCompozitional> > &stiluri) const;
 
     static Scena dinFisier(const std::string &numeFisier);
 
