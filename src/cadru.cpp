@@ -4,10 +4,11 @@
 #include "decor.h"
 #include "sursa_lumina.h"
 #include "stil_compozitional.h"
-#include "stiluri.h"
 #include "observator_cadru.h"
+#include "registru_stiluri.h"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <iostream>
 
 // ============================================================
@@ -74,10 +75,9 @@ void Cadru::eliminaObservatori() {
 }
 
 double Cadru::calculeazaScorCompozitie() const {
-    // stilul default: cinematic neutru (prezerva comportamentul preexistent)
-    // static const: instantiere unica, fara overhead la fiecare apel
-    static const StilCinematic implicit;
-    return calculeazaScorCompozitie(implicit);
+    // foloseste stilul curent din Singleton (default "cinematic" la pornire)
+    // asa optiunea 7 din meniu afecteaza opt 1, 2, 4, 8 (toate scorurile implicite)
+    return calculeazaScorCompozitie(RegistruStiluri::get().stilCurent());
 }
 
 double Cadru::calculeazaScorCompozitie(const StilCompozitional &stil) const {
@@ -94,8 +94,25 @@ double Cadru::calculeazaScorCompozitie(const StilCompozitional &stil) const {
         ponderaTotal += pondere;
     }
     const double scorAgregat = scorTotal / ponderaTotal;
+    // penalty "obiectiv" (indep de stil): suprapuneri + densitate
+    const double scorPenalizat = std::max(0.0, scorAgregat - penalizariCompozitionale());
     // stilul aplica ultimul ajustaj in functie de tipul dominant de compozitie
-    return stil.ajustarePentruTip(tipCompozitie(), scorAgregat);
+    return stil.ajustarePentruTip(tipCompozitie(), scorPenalizat);
+}
+
+double Cadru::penalizariCompozitionale() const {
+    double penalty = 0.0;
+    // suprapuneri: -10 fix daca exista oricare, indif de stil
+    if (areSuprapuneri())
+        penalty += 10.0;
+    // densitate: peste pragul de 6 subiecte, cadrul "tipa" - prea multe focal points
+    // -3 puncte per subiect peste prag
+    constexpr std::size_t pragDensitate = 6;
+    if (subiecte.size() > pragDensitate) {
+        const std::size_t exces = subiecte.size() - pragDensitate;
+        penalty += static_cast<double>(exces) * 3.0;
+    }
+    return penalty;
 }
 
 std::string Cadru::interpreteazaScor() const {
@@ -126,6 +143,11 @@ void Cadru::raportDetaliat() const {
     }
     if (areSuprapuneri())
         std::cout << "  ! Atentie: exista suprapuneri intre subiecte\n";
+    // afisam penalty aplicat scorului brut, daca e
+    const double penalty = penalizariCompozitionale();
+    if (penalty > 0.0)
+        std::cout << "  ! Penalizare compozitionala: -" << penalty
+                << " puncte (suprapuneri sau cadru prea incarcat)\n";
 }
 
 const SubiectVizual &Cadru::protagonistul() const {

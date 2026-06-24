@@ -77,9 +77,9 @@ void Scena::afiseazaClasament() const {
     std::cout << "\n";
 }
 
-/*std::size_t Scena::numarCadre() const {
+std::size_t Scena::numarCadre() const {
     return cadre.size();
-}*/
+}
 
 void Scena::afiseazaAnalizaCadru(std::size_t index) const {
     if (index >= cadre.size())

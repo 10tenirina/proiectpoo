@@ -17,6 +17,7 @@
 namespace {
     void afiseazaMeniu() {
         std::cout << "\n=== Meniu interactiv (comenzi din stdin / tastatura.txt) ===\n"
+                << "  (indecsii cadrelor incep de la 1)\n"
                 << "  1             - afiseaza raportul scenei\n"
                 << "  2             - afiseaza clasamentul cadrelor\n"
                 << "  3 i j         - compara cadrele i si j\n"
@@ -33,6 +34,16 @@ namespace {
     // Singleton-ul RegistruStiluri e accesat direct cand e nevoie - nu mai pasam
     // un vector de stiluri ca parametru
     void ruleazaMeniu(Scena &scena) {
+        // converteste index 1-based din input la 0-based intern
+        // arunca cu mesaj clar daca e in afara intervalului
+        auto idx0 = [&scena](std::size_t i) -> std::size_t {
+            if (i == 0 || i > scena.numarCadre())
+                throw ExceptieCadruInvalid(
+                    "index cadru invalid: " + std::to_string(i)
+                    + " (trebuie intre 1 si " + std::to_string(scena.numarCadre()) + ")");
+            return i - 1;
+        };
+
         afiseazaMeniu();
         int optiune = 0;
         while (std::cin >> optiune) {
@@ -52,26 +63,26 @@ namespace {
                         std::size_t i = 0;
                         std::size_t j = 0;
                         std::cin >> i >> j;
-                        scena.comparaCadre(i, j);
+                        scena.comparaCadre(idx0(i), idx0(j));
                         break;
                     }
                     case 4: {
                         std::size_t i = 0;
                         std::cin >> i;
-                        scena.afiseazaAnalizaCadru(i);
+                        scena.afiseazaAnalizaCadru(idx0(i));
                         break;
                     }
                     case 5: {
                         std::size_t i = 0;
                         std::cin >> i;
-                        scena.adaugaSubiectLaCadru(i, creeazaSubiectDinStream(std::cin));
+                        scena.adaugaSubiectLaCadru(idx0(i), creeazaSubiectDinStream(std::cin));
                         std::cout << "Subiect adaugat in cadrul " << i << ".\n";
                         break;
                     }
                     case 6: {
                         std::size_t i = 0;
                         std::cin >> i;
-                        scena.evalueazaCadruCuStiluri(i, RegistruStiluri::get().toateStilurile());
+                        scena.evalueazaCadruCuStiluri(idx0(i), RegistruStiluri::get().toateStilurile());
                         // contor sesiune: incrementam la fiecare evaluare comandata
                         RegistruStiluri::get().incrementaCadre();
                         break;
@@ -83,13 +94,16 @@ namespace {
                         const std::string vechi = r.numeStilCurent();
                         r.seteazaStilCurent(nume);
                         std::cout << "Stil global: \"" << vechi << "\" -> \""
-                                << r.numeStilCurent() << "\"\n";
+                                << r.numeStilCurent() << "\"\n"
+                                << "  (afecteaza optiunile 1, 2, 4, 8 - reevalueaza cu noul stil)\n";
                         break;
                     }
                     case 8: {
                         const auto stats = scena.statisticiScoruri();
                         std::cout << "Statistici scoruri scena \"" << scena.getTitlu()
-                                << "\": " << stats << "\n";
+                                << "\" sub stilul \""
+                                << RegistruStiluri::get().numeStilCurent() << "\": "
+                                << stats << "\n";
                         break;
                     }
                     default:

@@ -8,14 +8,14 @@ Proiect realizat în cadrul cursului de **Programare Orientată pe Obiecte** (Fa
 
 Programul analizează cadre cinematografice și evaluează cât de bine respectă elementele din scenă rule of thirds.
 Fiecare element focal (actor, recuzită, decor, sursă de lumină) este reprezentat printr-un bounding box, iar programul
-calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element. Mai
-mult, scorul poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson,
-documentar, cinematic neutru) — același cadru poate fi „bun pentru Hollywood” și „slab pentru Wes Anderson”.
+calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element.
+Cadrele cu **suprapuneri** sau **prea multe subiecte** (cadru "care țipă") sunt penalizate automat. Mai mult, scorul
+poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson, documentar, cinematic
+neutru) — același cadru poate fi „bun pentru Hollywood” și „slab pentru Wes Anderson”.
 
 ## Format fișiere de date
 
 **`scena.txt`** — o scenă cu mai multe cadre:
-
 ```
 <titlu_scena> <numar_cadre>
  
@@ -29,7 +29,6 @@ documentar, cinematic neutru) — același cadru poate fi „bun pentru Hollywoo
 **`cadru_test.txt`** — un singur cadru, fără header de scenă, restul identic.
 
 **Linie de subiect** (token-cu-token, separate prin spațiu):
-
 ```
 <denumire> <x> <y> <latime> <inaltime> <Tip> <importanta> <camp_specific>
 ```
@@ -56,43 +55,46 @@ Programul citește comenzi din `std::cin`. Le poți tasta direct sau le pui în 
 
 ### Comenzi (o comandă pe linie)
 
-| Comandă         | Efect                                                                                                                                  |
-|-----------------|----------------------------------------------------------------------------------------------------------------------------------------|
-| `1`             | Raport scena: scor și interpretare pe fiecare cadru, scor mediu, cadru recomandat.                                                     |
-| `2`             | Clasament cadrelor ordonate descrescător după scor, cu tipul de compoziție.                                                            |
-| `3 i j`         | Compară side-by-side cadrele `i` și `j` (scor, tip compoziție, echilibru vizual).                                                      |
-| `4 i`           | Analiză detaliată a cadrului `i`: scorul fiecărui subiect + sfat, suprapuneri, tip compoziție, echilibru.                              |
-| `5 i <subiect>` | Adaugă un subiect în cadrul `i`. `<subiect>` în același format ca în fișiere (vezi mai sus). Declanșează automat observatorii atașați. |
-| `6 i`           | Evaluează cadrul `i` cu toate cele 4 stiluri cinematografice și afișează scorurile comparativ.                                         |
-| `7 nume_stil`   | Schimbă stilul global al sesiunii. Stiluri disponibile: `cinematic`, `hollywood_clasic`, `wes_anderson`, `documentar`.                 |
-| `8`             | Statistici peste scorurile cadrelor din scenă: număr, min, max, medie, mediană.                                                        |
-| `0`             | Ieșire din modul interactiv.                                                                                                           |
+Indecșii cadrelor încep de la **1**.
+
+| Comandă         | Efect                                                                                                                                                                |
+|-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `1`             | Raport scena: scor și interpretare pe fiecare cadru, scor mediu, cadru recomandat.                                                                                   |
+| `2`             | Clasament cadrelor ordonate descrescător după scor, cu tipul de compoziție.                                                                                          |
+| `3 i j`         | Compară side-by-side cadrele `i` și `j` (scor, tip compoziție, echilibru vizual).                                                                                    |
+| `4 i`           | Analiză detaliată a cadrului `i`: scorul fiecărui subiect + sfat, suprapuneri, penalizări, tip compoziție, echilibru.                                                |
+| `5 i <subiect>` | Adaugă un subiect în cadrul `i`. `<subiect>` în același format ca în fișiere (vezi mai sus). Declanșează automat observatorii atașați.                               |
+| `6 i`           | Evaluează cadrul `i` cu toate cele 4 stiluri cinematografice și afișează scorurile comparativ.                                                                       |
+| `7 nume_stil`   | Schimbă stilul global al sesiunii. Afectează scorurile din opțiunile 1, 2, 4, 8. Stiluri disponibile: `cinematic`, `hollywood_clasic`, `wes_anderson`, `documentar`. |
+| `8`             | Statistici peste scorurile cadrelor sub stilul curent: număr, min, max, medie, mediană.                                                                              |
+| `0`             | Ieșire din modul interactiv.                                                                                                                                         |
 
 **Exemplu pentru `5 i <subiect>`:**
-
 ```
-5 0 Reflector 640 360 80 120 SursaLumina 6 laterala
+5 1 Reflector 640 360 80 120 SursaLumina 6 laterala
 ```
 
 **Observații:**
 
-- Indecșii cadrelor încep de la `0`.
-- Un index invalid produce un mesaj de eroare, nu oprește programul.
+- Un index invalid produce un mesaj de eroare clar, nu oprește programul.
 - La `stdin` gol, programul iese imediat (nu blochează CI-ul).
 - Opțiunea `5` declanșează observatorii instalați la pornire: un logger pe `stderr` și un monitor de compoziție pe
   `stdout`.
-
 ### Exemplu de `tastatura.txt`
+
+Conținutul de mai jos e și fișierul `tastatura.txt` din proiect — îl poți folosi ca demo cap-coadă pentru toate
+funcționalitățile (Strategy, Singleton, Observer, Statistici, penalizări):
 
 ```
 1
 2
-6 0
 6 1
 7 wes_anderson
+1
+7 cinematic
 8
-5 0 Reflector 640 360 80 120 SursaLumina 6 laterala
-4 0
+5 1 Reflector 640 360 80 120 SursaLumina 6 laterala
+4 1
 0
 ```
 

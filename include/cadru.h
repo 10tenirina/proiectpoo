@@ -55,6 +55,9 @@ class Cadru {
     // lifetime ul e gestionat in afara (observator_cadru.h)
     std::vector<ObservatorCadru *> observatori;
 
+    // penalty pe scor brut, indep de stil: suprapuneri si cadru prea incarcat
+    double penalizariCompozitionale() const;
+
 public:
     Cadru();
 
