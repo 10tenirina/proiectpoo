@@ -8,10 +8,9 @@ Proiect realizat în cadrul cursului de **Programare Orientată pe Obiecte** (Fa
 
 Programul analizează cadre cinematografice și evaluează cât de bine respectă elementele din scenă rule of thirds.
 Fiecare element focal (actor, recuzită, decor, sursă de lumină) este reprezentat printr-un bounding box, iar programul
-calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element.
-Cadrele cu **suprapuneri** sau **prea multe subiecte** (cadru "care țipă") sunt penalizate automat. Mai mult, scorul
-poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson, documentar, cinematic
-neutru) — același cadru poate fi „bun pentru Hollywood” și „slab pentru Wes Anderson”.
+calculează un scor de compoziție bazat pe distanța față de power points, ponderat cu importanța fiecărui element. Mai
+mult, scorul poate fi reevaluat prin lentila unui **stil cinematografic** ales (Hollywood clasic, Wes Anderson,
+documentar, cinematic neutru).
 
 ## Format fișiere de date
 
